@@ -1,8 +1,10 @@
 package com.example.demo.controller;
 
+import com.example.demo.repository.EarthquakeShelterRepository;
 import com.example.demo.service.EarthquakeShelterService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.Map;
 
@@ -10,8 +12,9 @@ class EarthquakeShelterControllerTest {
 
     @Test
     void testEarthquake() {
-        // 1. 컨트롤러 객체 생성
-        EarthquakeShelterService service = new EarthquakeShelterService();
+        // 1. Repository 모킹 후 서비스 및 컨트롤러 객체 생성
+        EarthquakeShelterRepository repository = Mockito.mock(EarthquakeShelterRepository.class);
+        EarthquakeShelterService service = new EarthquakeShelterService(repository);
         EarthquakeShelterController controller = new EarthquakeShelterController(service);
 
         // 2. 메서드 직접 호출
