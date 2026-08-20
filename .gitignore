@@ -31,3 +31,14 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# 개인 환경 설정 파일 제외
+.env
+application-local.properties
+application-secret.properties
+
+# 데이터 및 로그 파일 제외
+*.csv
+*.json
+*.xml
+logs/
