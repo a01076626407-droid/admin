@@ -1,4 +1,3 @@
-# 20260820 12:00
 # scripts/check_excel.py
 import pandas as pd
 
