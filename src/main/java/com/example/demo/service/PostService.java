@@ -13,26 +13,33 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
 
-    private final PostRepository postRepository; // 게시글 창고 관리자
+    private final PostRepository postRepository;
 
+    // 1. 글 등록 (작성자 아이디 함께 저장)
     @Transactional
-    public void createPost(PostCreateDto dto) {
-        // 1. 새 게시글 장부 생성
+    public void createPost(PostCreateDto dto, String writer) {
         Post post = new Post();
         post.setTitle(dto.getTitle());
         post.setContent(dto.getContent());
+        post.setWriter(writer); // 작성자 기록
 
-        // 2. 창고 관리자를 통해 데이터베이스에 저장
         postRepository.save(post);
     }
+
+    // 2. 전체 글 목록 조회
     public List<Post> getAllPosts() {
         return postRepository.findAll();
     }
 
-    public void savePost(PostCreateDto dto) {
-    }
+    // 3. 단건 글 조회 (상세보기용)
     public Post getPostById(Long id) {
         return postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다. ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+    }
+
+    // 4. 글 삭제
+    @Transactional
+    public void deletePost(Long id) {
+        postRepository.deleteById(id);
     }
 }

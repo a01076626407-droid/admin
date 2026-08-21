@@ -16,4 +16,5 @@ public class Post {
 
     @Column(length = 1000)
     private String content; // 글 내용 (길게 쓸 수 있도록 설정)
+    private String writer; // 🟢 작성자(유저 아이디) 필드 추가
 }
