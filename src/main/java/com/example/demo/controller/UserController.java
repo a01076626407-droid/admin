@@ -16,9 +16,10 @@ public class UserController {
 
     private final UserService userService;
 
+    // 🟢 첫 화면 접속 시 대피소 페이지가 뜨도록 변경했습니다!
     @GetMapping("/")
     public String root() {
-        return "login";
+        return "shelter";
     }
 
     @GetMapping("/login")
@@ -40,7 +41,7 @@ public class UserController {
         return "write";
     }
 
-    // 🟢 [핵심 수정] 로그인 처리 창구
+    // 로그인 처리 창구
     @PostMapping("/api/users/login")
     public String login(String username, String password, HttpSession session, Model model) {
         try {
@@ -48,7 +49,6 @@ public class UserController {
             session.setAttribute("loginUser", user.getUsername());
             return "redirect:/posts"; // 성공 시 게시판으로 이동
         } catch (IllegalArgumentException e) {
-            // 정보가 틀리면 에러 메시지를 챙겨서 로그인 창을 다시 보여줍니다!
             model.addAttribute("errorMessage", "아이디 또는 비밀번호가 잘못되었습니다.");
             return "login";
         }

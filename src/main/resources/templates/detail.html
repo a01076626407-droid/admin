@@ -6,6 +6,12 @@
   <title>게시글 상세 보기</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- 화면 전체를 175% 확대해서 보여줍니다 -->
+  <style>
+    body {
+      zoom: 175%;
+    }
+  </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
 
@@ -17,10 +23,10 @@
       <span class="text-xs text-slate-400 font-mono" th:text="'번호: ' + ${post.id}">ID</span>
     </div>
 
-    <!-- 작성시간 정보 출력 영역 -->
+    <!-- 디테일한 작성시간 출력 -->
     <div class="text-xs text-slate-400 flex items-center gap-2">
       <i class="fa-regular fa-clock text-slate-400 text-sm"></i>
-      <span th:text="${post.createDate != null ? #temporals.format(post.createDate, 'yyyy-MM-dd HH:mm') : '방금 전'}">작성시간</span>
+      <span th:text="${post.createDate != null ? #temporals.format(post.createDate, 'yyyy년 MM월 dd일 HH시 mm분') : '시간 정보 없음'}">작성시간</span>
     </div>
 
     <!-- 글 내용 박스 -->

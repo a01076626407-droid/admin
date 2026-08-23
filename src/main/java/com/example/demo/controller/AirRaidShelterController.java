@@ -20,4 +20,5 @@ public class AirRaidShelterController {
     public List<AirRaidShelter> getAllShelters() {
         return airRaidShelterService.getAllShelters().stream().limit(100).toList();
     }
+
 }
