@@ -22,6 +22,9 @@ public class EarthquakeShelter {
     @Column(name = "daddr")
     private String daddr; // 주소
 
+    @Column(name = "mng_dept_nm")
+    private String mngDeptNm; // 관리 부서
+
     @Column(name = "lat")
     private Double lat;
 

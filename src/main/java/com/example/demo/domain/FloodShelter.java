@@ -17,10 +17,13 @@ public class FloodShelter {
     private Long id;
 
     @Column(name = "fclt_nm")
-    private String fcltNm;
+    private String fcltNm; // 시설명
 
     @Column(name = "daddr")
-    private String daddr;
+    private String daddr; // 주소
+
+    @Column(name = "mng_dept_nm")
+    private String mngDeptNm; // 관리 부서
 
     @Column(name = "lat")
     private Double lat;

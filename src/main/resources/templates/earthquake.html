@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>서울재난안전가이드 - 지진 대피소</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style> body { zoom: 175%; } </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
+<header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
+    <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white text-sm shadow-sm">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h1 class="font-bold text-slate-900 text-base">서울재난안전가이드</h1>
+    </div>
+    <div class="flex items-center gap-3">
+        <span class="text-xs bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full">지진 대피소 DB 연동</span>
+        <a href="/login" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm transition"><i class="fa-solid fa-user-shield mr-1"></i> 관리자</a>
+    </div>
+</header>
+<nav class="bg-white border-b border-slate-200 px-6 py-3 flex justify-center gap-2 shadow-sm">
+    <a href="/shelter" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition"><i class="fa-solid fa-person-shelter mr-1"></i> 공습 대피소</a>
+    <a href="/earthquake" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl transition"><i class="fa-solid fa-house-chimney-crack mr-1"></i> 지진 대피소</a>
+    <a href="/flood" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition"><i class="fa-solid fa-water mr-1"></i> 홍수 대피소</a>
+</nav>
+<main class="max-w-4xl mx-auto px-4 py-10 flex-1 w-full space-y-6">
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="font-bold text-slate-900 text-base">지진 옥외 대피소 목록</h2>
+                <p class="text-xs text-slate-400">카드를 클릭하면 상세 정보를 확인할 수 있습니다.</p>
+            </div>
+            <span class="text-[11px] font-mono text-slate-400 bg-slate-100 px-2.5 py-1 rounded-lg">GET /api/earthquake/shelters</span>
+        </div>
+        <div class="space-y-3" th:if="${shelters != null and !#lists.isEmpty(shelters)}">
+            <div th:each="shelter, stat : ${shelters}" class="p-4 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-slate-50/50 transition flex justify-between items-center">
+                <div class="space-y-1">
+                    <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded" th:text="'#' + (${stat.index + 1}) + ' 지진 대피소'">#1 지진 대피소</span>
+                    <h3 class="font-bold text-slate-900 text-sm" th:text="${shelter.fcltNm}">대피소 이름</h3>
+                    <p class="text-xs text-slate-500"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i><span th:text="${shelter.daddr}">주소</span></p>
+                </div>
+                <a th:href="@{/earthquake/detail/{id}(id=${shelter.id})}" class="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-lg shadow-sm transition">
+                    상세 보기
+                </a>
+            </div>
+        </div>
+        <div class="text-center py-8 text-slate-400 text-xs" th:if="${shelters == null or #lists.isEmpty(shelters)}">불러올 지진 대피소 데이터가 없습니다.</div>
+    </div>
+</main>
+</body>
+</html>
