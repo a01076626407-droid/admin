@@ -4,123 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>방명록 게시판</title>
-    <style>
-        body {
-            background-color: #f5f6fa;
-            margin: 0;
-            padding: 40px;
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-        }
-
-        .list-container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 900px;
-        }
-
-        .header-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .header-section h2 {
-            margin: 0;
-            color: #333;
-        }
-
-        .write-btn {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: bold;
-            transition: background-color 0.2s;
-        }
-
-        .write-btn:hover {
-            background-color: #0056b3;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            table-layout: fixed;
-        }
-
-        th, td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-            color: #444;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-
-        th {
-            background-color: #f8f9fa;
-            color: #333;
-            font-weight: bold;
-        }
-
-        tr:hover {
-            background-color: #f1f2f6;
-        }
-
-        .col-id { width: 10%; text-align: center; }
-        .col-title { width: 30%; }
-        .col-writer { width: 15%; } /* 🟢 작성자 열 너비 추가 */
-        .col-content { width: 45%; } /* 🟢 내용 열 너비 조정 */
-
-        .col-title a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .col-title a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
 
-<div class="list-container">
-    <div class="header-section">
-        <h2>📋 방명록 게시판</h2>
-        <a href="/write" class="write-btn">글 쓰러 가기</a>
+<main class="max-w-4xl mx-auto px-4 py-10 flex-1 w-full space-y-6">
+    <!-- 상단 타이틀 박스 -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white text-lg shadow-sm">
+                <i class="fa-solid fa-clipboard-list"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-slate-900 text-lg">방명록 게시판</h1>
+                <p class="text-xs text-slate-400">10개씩 모아서 볼 수 있는 게시판입니다.</p>
+            </div>
+        </div>
+        <a href="/posts/write" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-sm transition">
+            글 쓰러 가기
+        </a>
     </div>
 
-    <table>
-        <thead>
-        <tr>
-            <th class="col-id">번호</th>
-            <th class="col-title">제목</th>
-            <th class="col-writer">작성자</th> <!-- 🟢 작성자 제목 추가 -->
-            <th class="col-content">내용</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- 타임리프를 이용해 게시글 목록 출력 -->
-        <tr th:each="post : ${postList}">
-            <td class="col-id" th:text="${post.id}">1</td>
-            <td class="col-title">
-                <a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}">제목</a>
-            </td>
-            <td class="col-writer" th:text="${post.writer}">작성자</td> <!-- 🟢 작성자 데이터 출력 -->
-            <td class="col-content" th:text="${post.content}">내용</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+    <!-- 게시글 테이블 박스 -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead>
+            <tr class="border-b border-slate-200 bg-slate-50 text-xs font-bold text-slate-500 uppercase">
+                <th class="py-3.5 px-6 w-16 text-center">번호</th>
+                <th class="py-3.5 px-6">제목</th>
+                <th class="py-3.5 px-6 w-32">작성자</th>
+                <th class="py-3.5 px-6">내용</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-sm">
+            <!-- DB에서 가져온 10개의 글 데이터를 반복문으로 출력 -->
+            <tr th:each="post, stat : ${paging.content}" class="hover:bg-slate-50/80 transition">
+                <td class="py-4 px-6 text-center text-slate-400 font-mono text-xs"
+                    th:text="${paging.totalElements - (paging.number * paging.size) - stat.index}">1</td>
+                <td class="py-4 px-6 font-bold text-blue-600">
+                    <!-- 제목을 누르면 해당 글 번호(id)의 상세 페이지로 이동합니다 -->
+                    <a th:href="@{/posts/{id}(id=${post.id})}" class="hover:underline" th:text="${post.title}">제목</a>
+                </td>
+                <td class="py-4 px-6 text-slate-600 text-xs" th:text="${post.writer != null ? post.writer : '익명'}">작성자</td>
+                <td class="py-4 px-6 text-slate-500 truncate max-w-xs" th:text="${post.content}">내용</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- 하단 페이징 버튼 영역 -->
+        <div class="p-4 border-t border-slate-100 flex justify-center items-center gap-2 bg-slate-50/50" th:if="${paging.totalPages > 0}">
+            <!-- 이전 페이지 버튼 -->
+            <a th:if="${paging.hasPrevious}" th:href="@{/posts(page=${paging.number - 1})}"
+               class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-100 transition">
+                이전
+            </a>
+
+            <!-- 페이지 번호 버튼들 (1, 2...) -->
+            <span th:each="pageNumber : ${#numbers.sequence(0, paging.totalPages - 1)}">
+                <a th:href="@{/posts(page=${pageNumber})}"
+                   th:text="${pageNumber + 1}"
+                   class="px-3 py-1.5 text-xs font-bold rounded-lg transition"
+                   th:classappend="${pageNumber == paging.number} ? 'bg-blue-600 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'">
+                   1
+                </a>
+            </span>
+
+            <!-- 다음 페이지 버튼 -->
+            <a th:if="${paging.hasNext}" th:href="@{/posts(page=${paging.number + 1})}"
+               class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-100 transition">
+                다음
+            </a>
+        </div>
+    </div>
+</main>
 
 </body>
 </html>

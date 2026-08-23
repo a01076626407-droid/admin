@@ -1,122 +1,49 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시글 작성</title>
-    <style>
-        /* 전체 화면 배경 및 중앙 정렬 (로그인창과 동일한 톤앤매너) */
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f5f6fa;
-            margin: 0;
-            font-family: sans-serif;
-        }
-
-        .write-container {
-            background-color: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 500px;
-            margin: 20px;
-            zoom:  1.50;
-        }
-
-        .write-container h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #333;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: #666;
-            font-weight: bold;
-        }
-
-        .input-group input,
-        .input-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 14px;
-            font-family: sans-serif;
-        }
-
-        .input-group textarea {
-            resize: vertical;
-            min-height: 150px;
-        }
-
-        .write-btn {
-            width: 100%;
-            padding: 12px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.2s;
-        }
-
-        .write-btn:hover {
-            background-color: #218838;
-        }
-
-        .back-link {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
-        .back-link a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .back-link a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
 
-<div class="write-container">
-    <h2>방명록 작성하기</h2>
-
-    <form action="/api/posts" method="POST">
-        <div class="input-group">
-            <label for="title">제목</label>
-            <input type="text" id="title" name="title" placeholder="제목을 입력하세요" required>
+<main class="max-w-2xl mx-auto px-4 py-16 flex-1 w-full">
+    <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
+        <div class="text-center space-y-2">
+            <h1 class="font-bold text-slate-900 text-2xl">방명록 작성하기</h1>
+            <p class="text-xs text-slate-400">자유롭게 의견을 남겨주세요.</p>
         </div>
 
-        <div class="input-group">
-            <label for="content">내용</label>
-            <textarea id="content" name="content" placeholder="내용을 입력하세요" required></textarea>
+        <!-- 데이터를 서버로 전송하는 form 태그 (POST 방식) -->
+        <form action="/posts/write" method="post" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">제목</label>
+                <input type="text" name="title" required placeholder="제목을 입력하세요"
+                       class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-blue-500 transition">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">내용</label>
+                <textarea name="content" rows="6" required placeholder="내용을 입력하세요"
+                          class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-blue-500 transition resize-none"></textarea>
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-sm transition text-sm">
+                    등록하기
+                </button>
+            </div>
+        </form>
+
+        <div class="text-center pt-2">
+            <a href="/posts" class="text-xs text-blue-600 hover:underline font-bold">
+                ← 게시글 목록으로 돌아가기
+            </a>
         </div>
-
-        <button type="submit" class="write-btn">등록하기</button>
-    </form>
-
-    <div class="back-link">
-        <a href="/posts">← 게시글 목록으로 돌아가기</a>
     </div>
-</div>
+</main>
 
 </body>
 </html>

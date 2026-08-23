@@ -2,82 +2,47 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>게시글 상세보기</title>
-  <style>
-    body {
-      background-color: #f5f6fa;
-      margin: 0;
-      padding: 40px;
-      font-family: sans-serif;
-      display: flex;
-      justify-content: center;
-    }
-    .detail-container {
-      background-color: white;
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 700px;
-    }
-    h2 { color: #333; margin-top: 0; }
-    .writer-info { font-size: 13px; color: #888; margin-bottom: 15px; }
-    .content-box {
-      background-color: #f8f9fa;
-      padding: 20px;
-      border-radius: 5px;
-      min-height: 150px;
-      margin: 20px 0;
-      white-space: pre-wrap;
-      word-break: break-all;
-      color: #444;
-      font-size: 15px;
-      line-height: 1.5;
-    }
-    .btn-group { display: flex; gap: 10px; align-items: center; }
-    .back-btn {
-      background-color: #6c757d;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 5px;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: bold;
-    }
-    .back-btn:hover { background-color: #5a6268; }
-    .delete-btn {
-      background-color: #dc3545;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .delete-btn:hover { background-color: #bd2130; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>게시글 상세 보기</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
 
-<div class="detail-container">
-  <h2 th:text="${post.title}">제목</h2>
-  <div class="writer-info">작성자: <span th:text="${post.writer}">작성자아이디</span></div>
-  <hr style="border:0; height:1px; background:#eee; margin: 20px 0;">
+<main class="max-w-2xl mx-auto px-4 py-16 flex-1 w-full">
+  <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6">
+    <!-- 상단 타이틀 -->
+    <div class="border-b border-slate-100 pb-4 flex justify-between items-center">
+      <h1 class="font-bold text-slate-900 text-xl" th:text="${post.title}">글 제목</h1>
+      <span class="text-xs text-slate-400 font-mono" th:text="'번호: ' + ${post.id}">ID</span>
+    </div>
 
-  <div class="content-box" th:text="${post.content}">
-    내용
+    <!-- 작성시간 정보 출력 영역 -->
+    <div class="text-xs text-slate-400 flex items-center gap-2">
+      <i class="fa-regular fa-clock text-slate-400 text-sm"></i>
+      <span th:text="${post.createDate != null ? #temporals.format(post.createDate, 'yyyy-MM-dd HH:mm') : '방금 전'}">작성시간</span>
+    </div>
+
+    <!-- 글 내용 박스 -->
+    <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 min-h-[160px] text-sm leading-relaxed text-slate-700 whitespace-pre-wrap"
+         th:text="${post.content}">
+      글 내용이 들어가는 자리입니다.
+    </div>
+
+    <!-- 하단 버튼 영역 -->
+    <div class="pt-4 flex justify-between items-center">
+      <a href="/posts" class="px-6 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl shadow-sm transition text-xs">
+        ← 목록으로
+      </a>
+      <a th:if="${session.loginUser != null and session.loginUser == post.writer}"
+         th:href="@{/posts/delete/{id}(id=${post.id})}"
+         onclick="return confirm('정말 이 글을 삭제하시겠습니까?');"
+         class="px-6 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-sm transition text-xs">
+        <i class="fa-solid fa-trash-can mr-1"></i> 삭제하기
+      </a>
+    </div>
   </div>
-
-  <div class="btn-group">
-    <a href="/posts" class="back-btn">목록으로</a>
-
-    <!-- 🟢 로그인한 유저와 글 작성자가 같을 때만 삭제 버튼 노출 -->
-    <form th:if="${session.loginUser == post.writer}" th:action="@{/posts/delete/{id}(id=${post.id})}" method="POST" style="margin:0;">
-      <button type="submit" class="delete-btn">삭제하기</button>
-    </form>
-  </div>
-</div>
+</main>
 
 </body>
 </html>
