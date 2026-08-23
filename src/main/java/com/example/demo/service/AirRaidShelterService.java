@@ -1,16 +1,19 @@
 package com.example.demo.service;
 
 import com.example.demo.domain.AirRaidShelter;
+import com.example.demo.repository.AirRaidShelterRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class AirRaidShelterService {
 
-    //repository를 통한 db 조회 로직
-    public List<AirRaidShelter> getAllShelters(){
-        return Collections.emptyList();
+    private final AirRaidShelterRepository airRaidShelterRepository;
+
+    public List<AirRaidShelter> getAllShelters() {
+        return airRaidShelterRepository.findAll();
     }
 }

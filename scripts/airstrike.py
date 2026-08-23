@@ -66,7 +66,7 @@ db_config = {
     "host": "localhost",
     "user": "root",
     "password": DB_PASSWORD,
-    "database": "airstrike",
+    "database": "disaster_db",
     "charset": "utf8mb4"
 }
 

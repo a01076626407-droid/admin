@@ -1,15 +1,18 @@
 package com.example.demo.service;
 
 import com.example.demo.domain.FloodShelter;
+import com.example.demo.repository.FloodShelterRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.Collections;
+
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class FloodShelterService {
+    private final FloodShelterRepository repository;
 
-    //repository를 통한 db 조회 로직
-    public List<FloodShelter> getAllShelters(){
-        return Collections.emptyList();
+    public List<FloodShelter> getAllShelters() {
+        return repository.findAll();
     }
 }

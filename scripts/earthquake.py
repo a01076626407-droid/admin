@@ -76,7 +76,7 @@ db_config = {
     "host": "localhost",
     "user": "root",
     "password": DB_PASSWORD,
-    "database": "shelter_db",
+    "database": "disaster_db",
     "charset": "utf8mb4"
 }
 
@@ -158,7 +158,7 @@ def fetch_and_save_data():
             print("\n[3] 기존 지진대피소 데이터 삭제 중...")
 
             cursor.execute(
-                "TRUNCATE TABLE shelter_info"
+                "TRUNCATE TABLE earthquake_shelter"
             )
 
             print("✅ 기존 데이터 삭제 완료")
@@ -172,27 +172,27 @@ def fetch_and_save_data():
             # ------------------------------------------------
 
             sql = """
-                INSERT INTO shelter_info
-                (
-                    ctpv_nm,
-                    sgg_nm,
-                    fclt_nm,
-                    daddr,
-                    lot,
-                    lat,
-                    mng_dept_nm
-                )
-                VALUES
-                (
-                    %s,
-                    %s,
-                    %s,
-                    %s,
-                    %s,
-                    %s,
-                    %s
-                )
-            """
+                  INSERT INTO earthquake_shelter
+                  (
+                      ctpv_nm,
+                      sgg_nm,
+                      fclt_nm,
+                      daddr,
+                      lot,
+                      lat,
+                      mng_dept_nm
+                  )
+                  VALUES
+                      (
+                          %s,
+                          %s,
+                          %s,
+                          %s,
+                          %s,
+                          %s,
+                          %s
+                      ) \
+                  """
 
 
             # ------------------------------------------------
@@ -202,8 +202,8 @@ def fetch_and_save_data():
             for i in range(total_pages):
 
                 start = (
-                    i * page_size
-                ) + 1
+                                i * page_size
+                        ) + 1
 
                 end = min(
                     (i + 1) * page_size,
@@ -291,7 +291,7 @@ def fetch_and_save_data():
 
             cursor.execute(
                 "SELECT COUNT(*) "
-                "FROM shelter_info"
+                "FROM earthquake_shelter"
             )
 
             saved_count = cursor.fetchone()[0]
@@ -307,10 +307,10 @@ def fetch_and_save_data():
             # ------------------------------------------------
 
             cursor.execute("""
-                SELECT *
-                FROM shelter_info
-                LIMIT 5
-            """)
+                           SELECT *
+                           FROM earthquake_shelter
+                                    LIMIT 5
+                           """)
 
             result = cursor.fetchall()
 
