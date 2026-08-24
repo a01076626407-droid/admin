@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import com.example.demo.domain.EarthquakeShelter;
 import com.example.demo.repository.EarthquakeShelterRepository;
 import com.example.demo.service.EarthquakeShelterService;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,25 +23,26 @@ public class EarthquakeShelterController {
     private final EarthquakeShelterRepository earthquakeShelterRepository;
 
     @GetMapping("/earthquake")
-    public String earthquakePage(@RequestParam(value = "page", defaultValue = "0") int page, Model model) {
+    public String earthquakePage(@RequestParam(value = "page", defaultValue = "0") int page,
+                                 @RequestParam(value = "keyword", required = false) String keyword,
+                                 Model model) {
         Pageable pageable = PageRequest.of(page, 20, Sort.by("id").ascending());
-        Page<EarthquakeShelter> paging = earthquakeShelterService.getShelters(pageable);
+        Page<EarthquakeShelter> paging = earthquakeShelterService.getShelters(keyword, pageable);
 
         model.addAttribute("shelters", paging.getContent());
         model.addAttribute("paging", paging);
+        model.addAttribute("keyword", keyword);
         return "earthquake";
     }
 
     @PostMapping("/earthquake/write")
-    public String writeShelter(EarthquakeShelter shelter, HttpSession session) {
-        if (!"super".equals(session.getAttribute("loginUser"))) return "redirect:/earthquake";
+    public String writeShelter(EarthquakeShelter shelter) {
         earthquakeShelterRepository.save(shelter);
         return "redirect:/earthquake";
     }
 
     @PostMapping("/earthquake/edit/{id}")
-    public String updateShelter(@PathVariable("id") Long id, EarthquakeShelter updated, HttpSession session) {
-        if (!"super".equals(session.getAttribute("loginUser"))) return "redirect:/earthquake";
+    public String updateShelter(@PathVariable("id") Long id, EarthquakeShelter updated) {
         EarthquakeShelter shelter = earthquakeShelterRepository.findById(id).orElse(null);
         if (shelter != null) {
             shelter.setCtpvNm(updated.getCtpvNm());
@@ -58,8 +58,7 @@ public class EarthquakeShelterController {
     }
 
     @GetMapping("/earthquake/delete/{id}")
-    public String deleteShelter(@PathVariable("id") Long id, HttpSession session) {
-        if (!"super".equals(session.getAttribute("loginUser"))) return "redirect:/earthquake";
+    public String deleteShelter(@PathVariable("id") Long id) {
         earthquakeShelterRepository.deleteById(id);
         return "redirect:/earthquake";
     }

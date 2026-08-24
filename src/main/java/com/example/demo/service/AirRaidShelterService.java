@@ -15,11 +15,13 @@ public class AirRaidShelterService {
 
     private final AirRaidShelterRepository airRaidShelterRepository;
 
-    public Page<AirRaidShelter> getShelters(Pageable pageable) {
-        return airRaidShelterRepository.findAll(pageable);
+    public Page<AirRaidShelter> getShelters(String keyword, Pageable pageable) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return airRaidShelterRepository.findAll(pageable);
+        }
+        return airRaidShelterRepository.findByFcltNmContainingOrDaddrContaining(keyword, keyword, pageable);
     }
 
-    // 🟢 관리자 페이지용 전체 조회 메서드 추가
     public List<AirRaidShelter> getAllShelters() {
         return airRaidShelterRepository.findAll();
     }

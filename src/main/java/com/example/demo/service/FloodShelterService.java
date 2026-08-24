@@ -14,11 +14,13 @@ import java.util.List;
 public class FloodShelterService {
     private final FloodShelterRepository floodShelterRepository;
 
-    public Page<FloodShelter> getShelters(Pageable pageable) {
-        return floodShelterRepository.findAll(pageable);
+    public Page<FloodShelter> getShelters(String keyword, Pageable pageable) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return floodShelterRepository.findAll(pageable);
+        }
+        return floodShelterRepository.findByFcltNmContainingOrDaddrContaining(keyword, keyword, pageable);
     }
 
-    // 🟢 관리자 페이지용 전체 조회 메서드 추가
     public List<FloodShelter> getAllShelters() {
         return floodShelterRepository.findAll();
     }

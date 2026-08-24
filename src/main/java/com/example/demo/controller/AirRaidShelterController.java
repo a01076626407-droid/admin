@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import com.example.demo.domain.AirRaidShelter;
 import com.example.demo.repository.AirRaidShelterRepository;
 import com.example.demo.service.AirRaidShelterService;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,25 +23,26 @@ public class AirRaidShelterController {
     private final AirRaidShelterRepository airRaidShelterRepository;
 
     @GetMapping({"/shelter", "/shelters"})
-    public String shelterPage(@RequestParam(value = "page", defaultValue = "0") int page, Model model) {
+    public String shelterPage(@RequestParam(value = "page", defaultValue = "0") int page,
+                              @RequestParam(value = "keyword", required = false) String keyword,
+                              Model model) {
         Pageable pageable = PageRequest.of(page, 20, Sort.by("id").ascending());
-        Page<AirRaidShelter> paging = airRaidShelterService.getShelters(pageable);
+        Page<AirRaidShelter> paging = airRaidShelterService.getShelters(keyword, pageable);
 
         model.addAttribute("shelters", paging.getContent());
         model.addAttribute("paging", paging);
+        model.addAttribute("keyword", keyword);
         return "shelter";
     }
 
     @PostMapping("/shelter/write")
-    public String writeShelter(AirRaidShelter shelter, HttpSession session) {
-        if (!"super".equals(session.getAttribute("loginUser"))) return "redirect:/shelter";
+    public String writeShelter(AirRaidShelter shelter) {
         airRaidShelterRepository.save(shelter);
         return "redirect:/shelter";
     }
 
     @PostMapping("/shelter/edit/{id}")
-    public String updateShelter(@PathVariable("id") Long id, AirRaidShelter updated, HttpSession session) {
-        if (!"super".equals(session.getAttribute("loginUser"))) return "redirect:/shelter";
+    public String updateShelter(@PathVariable("id") Long id, AirRaidShelter updated) {
         AirRaidShelter shelter = airRaidShelterRepository.findById(id).orElse(null);
         if (shelter != null) {
             shelter.setCtpvNm(updated.getCtpvNm());
@@ -58,8 +58,7 @@ public class AirRaidShelterController {
     }
 
     @GetMapping("/shelter/delete/{id}")
-    public String deleteShelter(@PathVariable("id") Long id, HttpSession session) {
-        if (!"super".equals(session.getAttribute("loginUser"))) return "redirect:/shelter";
+    public String deleteShelter(@PathVariable("id") Long id) {
         airRaidShelterRepository.deleteById(id);
         return "redirect:/shelter";
     }

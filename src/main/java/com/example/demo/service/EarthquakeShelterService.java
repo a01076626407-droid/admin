@@ -14,11 +14,13 @@ import java.util.List;
 public class EarthquakeShelterService {
     private final EarthquakeShelterRepository earthquakeShelterRepository;
 
-    public Page<EarthquakeShelter> getShelters(Pageable pageable) {
-        return earthquakeShelterRepository.findAll(pageable);
+    public Page<EarthquakeShelter> getShelters(String keyword, Pageable pageable) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return earthquakeShelterRepository.findAll(pageable);
+        }
+        return earthquakeShelterRepository.findByFcltNmContainingOrDaddrContaining(keyword, keyword, pageable);
     }
 
-    // 🟢 관리자 페이지용 전체 조회 메서드 추가
     public List<EarthquakeShelter> getAllShelters() {
         return earthquakeShelterRepository.findAll();
     }

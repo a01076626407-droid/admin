@@ -17,8 +17,8 @@
         <h1 class="font-bold text-slate-900 text-base">서울재난안전가이드</h1>
     </div>
     <div class="flex items-center gap-3">
-        <span class="text-xs bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full">전체 대피소 DB 연동 완료</span>
-        <button th:if="${session.loginUser == 'super'}" onclick="document.getElementById('writeModal').classList.remove('hidden')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+        <span class="text-xs bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full">공습 대피소 DB 연동</span>
+        <button onclick="document.getElementById('writeModal').classList.remove('hidden')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
             <i class="fa-solid fa-plus mr-1"></i> 대피소 등록
         </button>
     </div>
@@ -34,9 +34,15 @@
         <div class="flex justify-between items-center">
             <div>
                 <h2 class="font-bold text-slate-900 text-base">민방위 공습 대피소 목록</h2>
-                <p class="text-xs text-slate-400">등록된 공습 대피소 상세 정보입니다.</p>
+                <p class="text-xs text-slate-400">등록된 공습 대피소 검색 및 관리</p>
             </div>
         </div>
+
+        <!-- 검색 폼 -->
+        <form action="/shelter" method="get" class="flex gap-2">
+            <input type="text" name="keyword" th:value="${keyword}" placeholder="대피소 이름 또는 주소 검색" class="px-3 py-1.5 border border-slate-200 rounded-xl text-xs flex-1 focus:outline-none focus:border-blue-500">
+            <button type="submit" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">검색</button>
+        </form>
 
         <div class="space-y-3" th:if="${shelters != null and !#lists.isEmpty(shelters)}">
             <div th:each="shelter, stat : ${shelters}" class="p-4 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-slate-50/50 transition flex justify-between items-center">
@@ -55,7 +61,7 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <div th:if="${session.loginUser == 'super'}" class="flex items-center gap-1">
+                    <div class="flex items-center gap-1">
                         <button type="button"
                                 th:data-id="${shelter.id}"
                                 th:data-ctpv="${shelter.ctpvNm}"
@@ -72,12 +78,13 @@
                 </div>
             </div>
         </div>
-        <div class="text-center py-8 text-slate-400 text-xs" th:if="${shelters == null or #lists.isEmpty(shelters)}">불러올 대피소 데이터가 없습니다.</div>
+        <div class="text-center py-8 text-slate-400 text-xs" th:if="${shelters == null or #lists.isEmpty(shelters)}">검색된 대피소 데이터가 없습니다.</div>
 
+        <!-- 페이지네이션 (검색 키워드 유지) -->
         <div class="flex justify-center items-center gap-2 pt-4 border-t border-slate-100" th:if="${paging != null and paging.totalPages > 0}">
-            <a th:href="@{/shelter(page=${paging.number - 1})}" th:if="${paging.hasPrevious}" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-50">이전</a>
-            <span class="text-xs text-slate-600 font-bold" th:text="${paging.number + 1 + ' / ' + paging.totalPages}">1 / 57</span>
-            <a th:href="@{/shelter(page=${paging.number + 1})}" th:if="${paging.hasNext}" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-50">다음</a>
+            <a th:href="@{/shelter(page=${paging.number - 1}, keyword=${keyword})}" th:if="${paging.hasPrevious}" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-50">이전</a>
+            <span class="text-xs text-slate-600 font-bold" th:text="${paging.number + 1 + ' / ' + paging.totalPages}">1 / 1</span>
+            <a th:href="@{/shelter(page=${paging.number + 1}, keyword=${keyword})}" th:if="${paging.hasNext}" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-50">다음</a>
         </div>
     </div>
 </main>
@@ -88,37 +95,16 @@
         <h3 class="font-bold text-slate-900 text-sm">새 공습 대피소 등록</h3>
         <form action="/shelter/write" method="post" class="space-y-2.5">
             <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="text-[11px] font-bold text-slate-600">시도명</label>
-                    <input type="text" name="ctpvNm" placeholder="예: 서울특별시" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-600">시군구명</label>
-                    <input type="text" name="sggNm" placeholder="예: 종로구" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
-                </div>
+                <div><label class="text-[11px] font-bold text-slate-600">시도명</label><input type="text" name="ctpvNm" placeholder="서울특별시" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
+                <div><label class="text-[11px] font-bold text-slate-600">시군구명</label><input type="text" name="sggNm" placeholder="종로구" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             </div>
-            <div>
-                <label class="text-[11px] font-bold text-slate-600">대피소 이름</label>
-                <input type="text" name="fcltNm" required placeholder="시설명 입력" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
-            </div>
-            <div>
-                <label class="text-[11px] font-bold text-slate-600">주소</label>
-                <input type="text" name="daddr" required placeholder="도로명 또는 지번 주소" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
-            </div>
+            <div><label class="text-[11px] font-bold text-slate-600">대피소 이름</label><input type="text" name="fcltNm" required class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
+            <div><label class="text-[11px] font-bold text-slate-600">주소</label><input type="text" name="daddr" required class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="text-[11px] font-bold text-slate-600">경도</label>
-                    <input type="text" name="lot" placeholder="예: 126.97" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-600">위도</label>
-                    <input type="text" name="lat" placeholder="예: 37.56" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
-                </div>
+                <div><label class="text-[11px] font-bold text-slate-600">경도</label><input type="text" name="lot" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
+                <div><label class="text-[11px] font-bold text-slate-600">위도</label><input type="text" name="lat" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             </div>
-            <div>
-                <label class="text-[11px] font-bold text-slate-600">관리부서명</label>
-                <input type="text" name="mngDeptNm" placeholder="관리 부서 입력" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
-            </div>
+            <div><label class="text-[11px] font-bold text-slate-600">관리부서명</label><input type="text" name="mngDeptNm" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             <div class="flex justify-end gap-2 pt-2">
                 <button type="button" onclick="document.getElementById('writeModal').classList.add('hidden')" class="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-bold rounded-xl">취소</button>
                 <button type="submit" class="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl">등록</button>
@@ -133,37 +119,16 @@
         <h3 class="font-bold text-slate-900 text-sm">공습 대피소 수정</h3>
         <form id="editForm" method="post" class="space-y-2.5">
             <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="text-[11px] font-bold text-slate-600">시도명</label>
-                    <input type="text" id="editCtpv" name="ctpvNm" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-600">시군구명</label>
-                    <input type="text" id="editSgg" name="sggNm" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
-                </div>
+                <div><label class="text-[11px] font-bold text-slate-600">시도명</label><input type="text" id="editCtpv" name="ctpvNm" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
+                <div><label class="text-[11px] font-bold text-slate-600">시군구명</label><input type="text" id="editSgg" name="sggNm" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             </div>
-            <div>
-                <label class="text-[11px] font-bold text-slate-600">대피소 이름</label>
-                <input type="text" id="editName" name="fcltNm" required class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
-            </div>
-            <div>
-                <label class="text-[11px] font-bold text-slate-600">주소</label>
-                <input type="text" id="editAddress" name="daddr" required class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
-            </div>
+            <div><label class="text-[11px] font-bold text-slate-600">대피소 이름</label><input type="text" id="editName" name="fcltNm" required class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
+            <div><label class="text-[11px] font-bold text-slate-600">주소</label><input type="text" id="editAddress" name="daddr" required class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="text-[11px] font-bold text-slate-600">경도</label>
-                    <input type="text" id="editLot" name="lot" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-600">위도</label>
-                    <input type="text" id="editLat" name="lat" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
-                </div>
+                <div><label class="text-[11px] font-bold text-slate-600">경도</label><input type="text" id="editLot" name="lot" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
+                <div><label class="text-[11px] font-bold text-slate-600">위도</label><input type="text" id="editLat" name="lat" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             </div>
-            <div>
-                <label class="text-[11px] font-bold text-slate-600">관리부서명</label>
-                <input type="text" id="editMng" name="mngDeptNm" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs">
-            </div>
+            <div><label class="text-[11px] font-bold text-slate-600">관리부서명</label><input type="text" id="editMng" name="mngDeptNm" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             <div class="flex justify-end gap-2 pt-2">
                 <button type="button" onclick="document.getElementById('editModal').classList.add('hidden')" class="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-bold rounded-xl">취소</button>
                 <button type="submit" class="px-3 py-1.5 bg-amber-500 text-white text-xs font-bold rounded-xl">수정 완료</button>
