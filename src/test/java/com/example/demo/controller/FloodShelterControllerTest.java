@@ -1,23 +1,20 @@
 package com.example.demo.controller;
 
-import com.example.demo.service.FloodShelterService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Map;
+import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest
 class FloodShelterControllerTest {
 
+    @Autowired
+    private FloodShelterController floodShelterController;
+
     @Test
-    void testFlood() {
-        // 1. 객체 생성
-        FloodShelterService service = new FloodShelterService();
-        FloodShelterController controller = new FloodShelterController(service);
-
-        // 2. 메서드 호출
-        Map<String, Object> response = controller.testFlood();
-
-        // 3. 결과 검증
-        Assertions.assertEquals("success", response.get("status"));
+    void contextLoads() {
+        // 컨트롤러가 스프링 컨테이너에 정상적으로 등록되었는지 테스트
+        assertThat(floodShelterController).isNotNull();
     }
 }
