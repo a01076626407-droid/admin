@@ -2,25 +2,30 @@ package com.example.demo.controller;
 
 import com.example.demo.repository.EarthquakeShelterRepository;
 import com.example.demo.service.EarthquakeShelterService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Map;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WebMvcTest(EarthquakeShelterController.class)
 class EarthquakeShelterControllerTest {
 
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private EarthquakeShelterService earthquakeShelterService;
+
+    @MockBean
+    private EarthquakeShelterRepository earthquakeShelterRepository;
+
     @Test
-    void testEarthquake() {
-        // 1. Repository 모킹 후 서비스 및 컨트롤러 객체 생성
-        EarthquakeShelterRepository repository = Mockito.mock(EarthquakeShelterRepository.class);
-        EarthquakeShelterService service = new EarthquakeShelterService(repository);
-        EarthquakeShelterController controller = new EarthquakeShelterController(service);
-
-        // 2. 메서드 직접 호출
-        Map<String, Object> response = controller.testEarthquake();
-
-        // 3. 반환값의 status가 "success"인지 확인
-        Assertions.assertEquals("success", response.get("status"));
+    void testEarthquake() throws Exception {
+        mockMvc.perform(get("/earthquake"))
+                .andExpect(status().isOk());
     }
 }

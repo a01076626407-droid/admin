@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>대피소 수정</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 40px; }
+        .container { max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; }
+        .btn-save { background-color: #28a745; color: white; }
+        .btn-cancel { background-color: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>대피소 정보 수정</h2>
+    <form th:action="@{/admin/shelters/edit/{id}(id=${shelter.id})}" method="post">
+        <label>대피소 이름</label>
+        <input type="text" name="fcltNm" th:value="${shelter.fcltNm}" required>
+
+        <label>주소</label>
+        <input type="text" name="daddr" th:value="${shelter.daddr}" required>
+
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" class="btn btn-save">수정 완료</button>
+            <a href="/admin/shelters" class="btn btn-cancel">취소</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

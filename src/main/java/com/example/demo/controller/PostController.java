@@ -58,9 +58,70 @@ public class PostController {
         return "detail";
     }
 
+    // 🟢 수정 페이지 이동 (super 계정 또는 작성자 본인만 허용)
+    @GetMapping("/posts/edit/{id}")
+    public String editPage(@PathVariable("id") Long id, Model model, jakarta.servlet.http.HttpSession session) {
+        String loginUser = (String) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/login";
+        }
+
+        Post post = postRepository.findById(id).orElse(null);
+        if (post == null) {
+            return "redirect:/posts";
+        }
+
+        if ("super".equals(loginUser) || loginUser.equals(post.getWriter())) {
+            model.addAttribute("post", post);
+            return "edit";
+        }
+
+        return "redirect:/posts";
+    }
+
+    // 🟢 수정 내용 저장 처리 (super 계정 또는 작성자 본인만 허용)
+    @PostMapping("/posts/edit/{id}")
+    public String updatePost(@PathVariable("id") Long id, Post updatedPost, jakarta.servlet.http.HttpSession session) {
+        String loginUser = (String) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/login";
+        }
+
+        Post post = postRepository.findById(id).orElse(null);
+        if (post != null) {
+            if ("super".equals(loginUser) || loginUser.equals(post.getWriter())) {
+                post.setTitle(updatedPost.getTitle());
+                post.setContent(updatedPost.getContent());
+                postRepository.save(post);
+            }
+        }
+
+        return "redirect:/posts/{id}";
+    }
+
     @GetMapping("/posts/delete/{id}")
-    public String deletePost(@PathVariable("id") Long id) {
-        postRepository.deleteById(id);
+    public String deletePost(@PathVariable("id") Long id, jakarta.servlet.http.HttpSession session) {
+        String loginUser = (String) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/login";
+        }
+
+        Post post = postRepository.findById(id).orElse(null);
+        if (post == null) {
+            return "redirect:/posts";
+        }
+
+        // 'super' 계정이거나, 글 작성자와 현재 로그인한 유저가 정확히 일치할 때만 삭제 허용
+        boolean isSuper = "super".equals(loginUser);
+        boolean isWriter = loginUser.equals(post.getWriter());
+
+        if (isSuper || isWriter) {
+            postRepository.deleteById(id);
+        } else {
+            // 권한이 없는 경우 삭제하지 않고 목록으로 돌려보냄
+            return "redirect:/posts?error=unauthorized";
+        }
+
         return "redirect:/posts";
     }
 }

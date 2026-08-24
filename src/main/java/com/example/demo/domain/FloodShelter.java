@@ -2,32 +2,23 @@ package com.example.demo.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "flood_shelter")
 @Getter
 @Setter
-@NoArgsConstructor
+@Table(name = "flood_shelter")
 public class FloodShelter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "fclt_nm")
-    private String fcltNm; // 시설명
-
-    @Column(name = "daddr")
-    private String daddr; // 주소
-
-    @Column(name = "mng_dept_nm")
-    private String mngDeptNm; // 관리 부서
-
-    @Column(name = "lat")
-    private Double lat;
-
-    @Column(name = "lot")
-    private Double lot;
+    private String ctpvNm;   // 시도명
+    private String sggNm;    // 시군구명
+    private String fcltNm;   // 대피소 이름
+    private String daddr;    // 주소
+    private String lot;      // 경도
+    private String lat;      // 위도
+    private String mngDeptNm;// 관리부서명
 }
