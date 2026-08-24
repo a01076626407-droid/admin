@@ -6,7 +6,7 @@
     <title>서울재난안전가이드 - 홍수 대피소</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style> body { zoom: 175%; } </style>
+    <style> body { zoom: 150%; } </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
 <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
@@ -62,7 +62,6 @@
 
                 <div class="flex items-center gap-2">
                     <div class="flex items-center gap-1">
-                        <!-- 수정 버튼에 데이터 속성들(ctpv, sgg, name, address, lot, lat, mng)이 완벽하게 매핑되도록 수정됨 -->
                         <button type="button"
                                 th:data-id="${shelter.id}"
                                 th:data-ctpv="${shelter.ctpvNm}"
@@ -94,7 +93,7 @@
 <div id="writeModal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
     <div class="bg-white rounded-2xl p-6 w-full max-w-lg space-y-3 shadow-lg">
         <h3 class="font-bold text-slate-900 text-sm">새 홍수 대피소 등록</h3>
-        <form action="/flood/write" method="post" class="space-y-2.5">
+        <form action="/flood/write" method="post" onsubmit="return showAlert(event, '홍수 대피소 등록이 완료되었습니다!')" class="space-y-2.5">
             <div class="grid grid-cols-2 gap-2">
                 <div><label class="text-[11px] font-bold text-slate-600">시도명</label><input type="text" name="ctpvNm" placeholder="서울특별시" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
                 <div><label class="text-[11px] font-bold text-slate-600">시군구명</label><input type="text" name="sggNm" placeholder="강북구" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
@@ -139,6 +138,12 @@
 </div>
 
 <script>
+    function showAlert(event, message) {
+        event.preventDefault();
+        alert(message);
+        event.target.submit();
+    }
+
     function openEditModal(button) {
         document.getElementById('editForm').action = '/flood/edit/' + button.getAttribute('data-id');
         document.getElementById('editCtpv').value = button.getAttribute('data-ctpv') || '';

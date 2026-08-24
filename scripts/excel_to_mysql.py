@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 # 1. 엑셀 파일 폴더 경로
 FOLDER_PATH = "scripts"
@@ -42,10 +42,28 @@ def run_etl():
 
     print(f"✨ 정제 완료: 유효 데이터 {len(clean_df):,}건 준비됨")
 
-    print("\n💾 [Step 3] MySQL flood_shelter 테이블에 데이터 밀어 넣기...")
+    print("\n💾 [Step 3] MySQL flood_shelter 테이블에 데이터 밀어 넣기 (안전 모드)...")
     engine = create_engine(DB_URL)
 
-    clean_df.to_sql(name='flood_shelter', con=engine, if_exists='append', index=False)
+    # Pandas to_sql 대신 순수 반복문과 text()를 사용하여 버전 충돌 원천 차단
+    with engine.begin() as conn:
+        for row in clean_df.itertuples(index=False):
+            sql = """
+                  INSERT INTO flood_shelter (ctpv_nm, sgg_nm, fclt_nm, daddr, lot, lat, mng_dept_nm)
+                  VALUES (:ctpv_nm, :sgg_nm, :fclt_nm, :daddr, :lot, :lat, :mng_dept_nm) \
+                  """
+            conn.execute(
+                text(sql),
+                {
+                    "ctpv_nm": row.ctpv_nm,
+                    "sgg_nm": row.sgg_nm,
+                    "fclt_nm": row.fclt_nm,
+                    "daddr": row.daddr,
+                    "lot": row.lot,
+                    "lat": row.lat,
+                    "mng_dept_nm": row.mng_dept_nm
+                }
+            )
 
     print("=" * 60)
     print(f"🎉 대성공! 총 {len(clean_df):,}건이 'flood_shelter' 테이블에 완벽하게 저장되었습니다!")
