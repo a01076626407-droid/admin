@@ -16,12 +16,6 @@ public class UserController {
 
     private final UserService userService;
 
-    // 🟢 첫 화면 접속 시 대피소 페이지가 뜨도록 변경했습니다!
-    @GetMapping("/")
-    public String root() {
-        return "shelter";
-    }
-
     @GetMapping("/login")
     public String loginPage() {
         return "login";

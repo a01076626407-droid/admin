@@ -1,55 +1,89 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>서울재난안전가이드 - 대피소 상세 정보</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style> body { zoom: 175%; } </style>
+  <title>방명록 상세보기</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 40px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-top: 0;
+      color: #333;
+    }
+    .info {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    .content {
+      min-height: 150px;
+      line-height: 1.6;
+      color: #444;
+      margin-bottom: 30px;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+    }
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .btn-list {
+      background-color: #6c757d;
+      color: white;
+    }
+    .btn-delete {
+      background-color: #dc3545;
+      color: white;
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
-<header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
-  <div class="flex items-center gap-2">
-    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white text-sm shadow-sm">
-      <i class="fa-solid fa-shield-halved"></i>
-    </div>
-    <h1 class="font-bold text-slate-900 text-base">서울재난안전가이드</h1>
-  </div>
-  <a href="javascript:history.back()" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">
-    <i class="fa-solid fa-arrow-left mr-1"></i> 목록으로
-  </a>
-</header>
+<body>
 
-<main class="max-w-xl mx-auto px-4 py-12 flex-1 w-full space-y-6">
-  <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-6" th:if="${shelter != null}">
-    <div class="space-y-2 border-b border-slate-100 pb-4">
-      <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">대피소 상세 정보</span>
-      <h2 class="text-lg font-bold text-slate-900" th:text="${shelter.fcltNm}">대피소 이름</h2>
-    </div>
+<div class="container">
+  <!-- 글 제목 -->
+  <h2 th:text="${post.title}">제목</h2>
 
-    <div class="space-y-4 text-sm">
-      <!-- 상세 주소 (공통) -->
-      <div class="flex items-start gap-3" th:if="${shelter.daddr != null}">
-        <i class="fa-solid fa-location-dot text-rose-500 mt-1"></i>
-        <div>
-          <p class="text-xs text-slate-400 font-bold">상세 주소</p>
-          <p class="text-slate-700 text-xs" th:text="${shelter.daddr}">주소</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="pt-4">
-      <a href="javascript:history.back()" class="block w-full text-center py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
-        목록으로 돌아가기
-      </a>
-    </div>
+  <!-- 작성자 및 작성일 -->
+  <div class="info">
+    작성자: <span th:text="${post.writer}">작성자</span> |
+    작성일: <span th:text="${post.createDate}">작성일</span>
   </div>
 
-  <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm text-center space-y-4" th:if="${shelter == null}">
-    <p class="text-slate-500 text-xs">해당 대피소 정보를 찾을 수 없습니다.</p>
-    <a href="javascript:history.back()" class="inline-block px-4 py-2 bg-slate-800 text-white text-xs font-bold rounded-xl">돌아가기</a>
+  <!-- 글 내용 -->
+  <div class="content" th:text="${post.content}">
+    내용이 들어가는 자리입니다.
   </div>
-</main>
+
+  <!-- 버튼 영역 (관리자이거나 본인이 작성한 글일 때만 삭제 버튼 노출) -->
+  <div class="btn-group">
+    <a href="/posts" class="btn btn-list">목록으로</a>
+
+    <a th:if="${session.loginUser == 'super' || session.loginUser == post.writer}"
+       th:href="@{/posts/delete/{id}(id=${post.id})}"
+       class="btn btn-delete"
+       onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
+  </div>
+</div>
+
 </body>
 </html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>재난 대피소 & 방명록 시스템</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 400px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .btn {
+            padding: 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        .btn-db {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-db:hover {
+            background-color: #0056b3;
+        }
+        .btn-login {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-login:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>안전 가이드 시스템</h1>
+    <p>원하시는 메뉴를 선택해주세요.</p>
+
+    <div class="btn-container">
+        <!-- 1. 대피소 DB 조회 페이지로 이동 -->
+        <a href="/shelters" class="btn btn-db">대피소 DB 조회하기</a>
+
+        <!-- 2. 로그인 페이지로 이동 -->
+        <a href="/login" class="btn btn-login">로그인하기</a>
+    </div>
+</div>
+
+</body>
+</html>
