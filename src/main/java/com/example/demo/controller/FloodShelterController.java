@@ -57,6 +57,8 @@ public class FloodShelterController {
         return "redirect:/flood";
     }
 
+
+
     @GetMapping("/flood/delete/{id}")
     public String deleteShelter(@PathVariable("id") Long id) {
         floodShelterRepository.deleteById(id);

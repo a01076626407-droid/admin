@@ -1,23 +1,33 @@
 package com.example.demo.controller;
 
+import com.example.demo.repository.AirRaidShelterRepository;
 import com.example.demo.service.AirRaidShelterService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Map;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+@WebMvcTest(AirRaidShelterController.class)
 class AirRaidShelterControllerTest {
 
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private AirRaidShelterService airRaidShelterService;
+
+    @MockBean
+    private AirRaidShelterRepository airRaidShelterRepository;
+
     @Test
-    void testAirRaid() {
-        // 1. 객체 생성
-        AirRaidShelterService service = new AirRaidShelterService();
-        AirRaidShelterController controller = new AirRaidShelterController(service);
-
-        // 2. 메서드 호출
-        Map<String, Object> response = controller.testAirRaid();
-
-        // 3. 결과 검증
-        Assertions.assertEquals("success", response.get("status"));
+    void testShelterPage() throws Exception {
+        mockMvc.perform(get("/shelter"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("shelter"));
     }
 }
