@@ -28,4 +28,5 @@ public class AirRaidShelterController {
         model.addAttribute("shelter", shelter);
         return "shelter-detail";
     }
+
 }
