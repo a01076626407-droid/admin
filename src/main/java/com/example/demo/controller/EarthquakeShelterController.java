@@ -9,6 +9,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -36,10 +37,21 @@ public class EarthquakeShelterController {
         return "redirect:/shelters/earthquake";
     }
 
-    // 👉 지진 대피소 등록 처리
     @PostMapping("/earthquake/write")
     public String writeEarthquakeShelter(EarthquakeShelter shelter) {
         earthquakeShelterService.save(shelter);
+        return "redirect:/shelters/earthquake";
+    }
+
+    @PostMapping("/earthquake/edit/{id}")
+    public String updateEarthquakeShelter(@PathVariable("id") String id, EarthquakeShelter shelter) {
+        earthquakeShelterService.update(id, shelter);
+        return "redirect:/shelters/earthquake";
+    }
+
+    @GetMapping("/earthquake/delete/{id}")
+    public String deleteEarthquakeShelter(@PathVariable("id") String id) {
+        earthquakeShelterService.delete(id);
         return "redirect:/shelters/earthquake";
     }
 }
