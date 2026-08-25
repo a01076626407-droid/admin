@@ -28,6 +28,7 @@ public class EarthquakeShelterController {
         Page<EarthquakeShelter> shelters = earthquakeShelterService.getShelters(keyword, pageable);
         model.addAttribute("shelters", shelters);
         model.addAttribute("keyword", keyword);
+        // "earthquake"; 뒤에 잘못 입력된 'a' 오타 수정
         return "earthquake";
     }
 
