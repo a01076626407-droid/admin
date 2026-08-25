@@ -17,6 +17,11 @@ public class UserService {
     // 1. 회원가입 로직
     @Transactional
     public void registerUser(UserSignupDto dto) {
+        // 🚨 최고 관리자 아이디 예약어 차단 (super 가입 방지)
+        if ("super".equals(dto.getUsername())) {
+            throw new IllegalArgumentException("사용할 수 없는 관리자 아이디입니다.");
+        }
+
         // 아이디 중복 확인
         if (userRepository.existsByUsername(dto.getUsername())) {
             throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
