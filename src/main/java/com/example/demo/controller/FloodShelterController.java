@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.UUID; // 👈 UUID 임포트 추가
+
 @Controller
 @RequiredArgsConstructor
 public class FloodShelterController {
@@ -39,6 +41,11 @@ public class FloodShelterController {
 
     @PostMapping("/flood/write")
     public String writeFloodShelter(FloodShelter shelter) {
+        // 👇 핵심: 등록할 때 ID가 없다면 FL_ + UUID 조합으로 고유 ID를 강제로 부여합니다!
+        if (shelter.getShltId() == null || shelter.getShltId().trim().isEmpty()) {
+            shelter.setShltId("FL_" + UUID.randomUUID().toString());
+        }
+
         floodShelterService.save(shelter);
         return "redirect:/shelters/flood";
     }
