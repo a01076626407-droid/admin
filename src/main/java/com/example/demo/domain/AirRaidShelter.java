@@ -6,18 +6,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "air_shelter_info")
+@Table(name = "airstrike")
 @Getter
 @Setter
 @NoArgsConstructor
 public class AirRaidShelter {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "shlt_id")
-    private String shltId;
+    @Column(name = "shlt_id") // 실제 DB의 PK 컬럼명과 매핑
+    private String shltId;      // 타입도 DB에 맞춰 String으로 지정 (IDENTITY 제거)
 
     @Column(name = "ctpv_nm")
     private String ctpvNm;

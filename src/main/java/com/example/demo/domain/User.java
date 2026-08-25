@@ -13,6 +13,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 3. 번호를 1번, 2번... 자동으로 매겨달라는 뜻입니다.
     private Long id;
 
+
+
+
     private String username; // 아이디
     private String password; // 비밀번호
     private String email;    //
