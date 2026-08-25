@@ -17,16 +17,20 @@
         <h1 class="font-bold text-slate-900 text-base">서울재난안전가이드</h1>
     </div>
     <div class="flex items-center gap-3">
-        <span class="text-xs bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full">홍수 대피소 DB 연동</span>
+        <form th:action="@{/shelters/sync/flood}" method="post" style="margin: 0;">
+            <button type="submit" class="text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-bold px-3 py-1.5 rounded-full transition cursor-pointer">
+                <i class="fa-solid fa-database mr-1"></i>홍수 대피소 DB 연동
+            </button>
+        </form>
         <button onclick="document.getElementById('writeModal').classList.remove('hidden')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
             <i class="fa-solid fa-plus mr-1"></i> 대피소 등록
         </button>
     </div>
 </header>
 <nav class="bg-white border-b border-slate-200 px-6 py-3 flex justify-center gap-2 shadow-sm">
-    <a href="/shelter" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition"><i class="fa-solid fa-person-shelter mr-1"></i> 공습 대피소</a>
-    <a href="/earthquake" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition"><i class="fa-solid fa-house-chimney-crack mr-1"></i> 지진 대피소</a>
-    <a href="/flood" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl transition"><i class="fa-solid fa-water mr-1"></i> 홍수 대피소</a>
+    <a href="/shelters/air" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition"><i class="fa-solid fa-person-shelter mr-1"></i> 공습 대피소</a>
+    <a href="/shelters/earthquake" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition"><i class="fa-solid fa-house-chimney-crack mr-1"></i> 지진 대피소</a>
+    <a href="/shelters/flood" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl transition"><i class="fa-solid fa-water mr-1"></i> 홍수 대피소</a>
 </nav>
 
 <main class="max-w-4xl mx-auto px-4 py-10 flex-1 w-full space-y-6">
@@ -34,12 +38,12 @@
         <div class="flex justify-between items-center">
             <div>
                 <h2 class="font-bold text-slate-900 text-base">홍수 수해 대피소 목록</h2>
-                <p class="text-xs text-slate-400">등록된 홍수 대피소 검색 및 관리</p>
+                <p class="text-xs text-slate-400">등록된 홍수 대피소 검색 및 관리 (총 <span th:text="${shelters.totalElements}">0</span>개)</p>
             </div>
         </div>
 
         <!-- 검색 폼 -->
-        <form action="/flood" method="get" class="flex gap-2">
+        <form action="/shelters/flood" method="get" class="flex gap-2">
             <input type="text" name="keyword" th:value="${keyword}" placeholder="대피소 이름 또는 주소 검색" class="px-3 py-1.5 border border-slate-200 rounded-xl text-xs flex-1 focus:outline-none focus:border-blue-500">
             <button type="submit" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">검색</button>
         </form>
@@ -48,7 +52,7 @@
             <div th:each="shelter, stat : ${shelters}" class="p-4 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-slate-50/50 transition flex justify-between items-center">
                 <div class="space-y-1">
                     <div class="flex items-center gap-2">
-                        <span class="text-xs font-bold text-cyan-600 bg-cyan-50 px-2 py-0.5 rounded" th:text="'#' + (${paging.number * 20 + stat.index + 1}) + ' 홍수 대피소'">#1 홍수 대피소</span>
+                        <span class="text-xs font-bold text-cyan-600 bg-cyan-50 px-2 py-0.5 rounded" th:text="'#' + (${shelters.number * 10 + stat.index + 1}) + ' 홍수 대피소'">#1 홍수 대피소</span>
                         <span class="text-[11px] text-slate-400" th:text="${(shelter.ctpvNm != null ? shelter.ctpvNm : '') + ' ' + (shelter.sggNm != null ? shelter.sggNm : '')}">시도 시군구</span>
                     </div>
                     <h3 class="font-bold text-slate-900 text-sm" th:text="${shelter.fcltNm}">대피소 이름</h3>
@@ -63,7 +67,7 @@
                 <div class="flex items-center gap-2">
                     <div class="flex items-center gap-1">
                         <button type="button"
-                                th:data-id="${shelter.id}"
+                                th:data-id="${shelter.shltId}"
                                 th:data-ctpv="${shelter.ctpvNm}"
                                 th:data-sgg="${shelter.sggNm}"
                                 th:data-name="${shelter.fcltNm}"
@@ -73,7 +77,7 @@
                                 th:data-mng="${shelter.mngDeptNm}"
                                 onclick="openEditModal(this)"
                                 class="px-2.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition">수정</button>
-                        <a th:href="@{/flood/delete/{id}(id=${shelter.id})}" onclick="return confirm('정말 삭제하시겠습니까?');" class="px-2.5 py-1.5 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-lg transition">삭제</a>
+                        <a th:href="@{/flood/delete/{id}(id=${shelter.shltId})}" onclick="return confirm('정말 삭제하시겠습니까?');" class="px-2.5 py-1.5 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-lg transition">삭제</a>
                     </div>
                 </div>
             </div>
@@ -81,10 +85,10 @@
         <div class="text-center py-8 text-slate-400 text-xs" th:if="${shelters == null or #lists.isEmpty(shelters)}">검색된 대피소 데이터가 없습니다.</div>
 
         <!-- 페이지네이션 (검색 키워드 유지) -->
-        <div class="flex justify-center items-center gap-2 pt-4 border-t border-slate-100" th:if="${paging != null and paging.totalPages > 0}">
-            <a th:href="@{/flood(page=${paging.number - 1}, keyword=${keyword})}" th:if="${paging.hasPrevious}" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-50">이전</a>
-            <span class="text-xs text-slate-600 font-bold" th:text="${paging.number + 1 + ' / ' + paging.totalPages}">1 / 1</span>
-            <a th:href="@{/flood(page=${paging.number + 1}, keyword=${keyword})}" th:if="${paging.hasNext}" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-50">다음</a>
+        <div class="flex justify-center items-center gap-2 pt-4 border-t border-slate-100" th:if="${shelters != null and shelters.totalPages > 0}">
+            <a th:href="@{/shelters/flood(page=${shelters.number - 1}, keyword=${keyword})}" th:if="${shelters.hasPrevious()}" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-50">이전</a>
+            <span class="text-xs text-slate-600 font-bold" th:text="${shelters.number + 1 + ' / ' + shelters.totalPages}">1 / 1</span>
+            <a th:href="@{/shelters/flood(page=${shelters.number + 1}, keyword=${keyword})}" th:if="${shelters.hasNext()}" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-50">다음</a>
         </div>
     </div>
 </main>
