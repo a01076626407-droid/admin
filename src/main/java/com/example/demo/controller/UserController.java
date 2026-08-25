@@ -41,7 +41,10 @@ public class UserController {
         try {
             User user = userService.login(username, password);
             session.setAttribute("loginUser", user.getUsername());
-            return "redirect:/posts"; // 성공 시 게시판으로 이동
+
+            // 로그인 성공 시, 게시판이 아닌 '메인 선택 화면(/main)'으로 강제 이동시킵니다.
+            return "redirect:/main";
+
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", "아이디 또는 비밀번호가 잘못되었습니다.");
             return "login";
