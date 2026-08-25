@@ -9,6 +9,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -18,7 +19,6 @@ public class AirRaidShelterController {
 
     private final AirRaidShelterService airRaidShelterService;
 
-    // /shelter 또는 /shelters/air 둘 다 이 메서드로 들어오도록 통합
     @GetMapping({"/shelter", "/shelters/air"})
     public String airShelters(
             @RequestParam(value = "keyword", required = false) String keyword,
@@ -28,20 +28,30 @@ public class AirRaidShelterController {
         Page<AirRaidShelter> shelters = airRaidShelterService.getShelters(keyword, pageable);
         model.addAttribute("shelters", shelters);
         model.addAttribute("keyword", keyword);
-        return "shelter"; // shelter.html 템플릿 반환
+        return "shelter";
     }
 
-    // 우측 상단 [공습 대피소 DB 연동] 버튼 클릭 시 실행되는 매핑
     @PostMapping("/shelters/sync/air")
     public String syncAirShelters() {
         airRaidShelterService.syncData();
         return "redirect:/shelters/air";
     }
 
-    // 모달창에서 대피소 등록을 처리하는 POST 매핑 (saveShelter -> save 로 수정)
     @PostMapping("/shelter/write")
     public String writeAirShelter(AirRaidShelter shelter) {
-        airRaidShelterService.save(shelter); // 👈 saveShelter를 save로 변경
+        airRaidShelterService.save(shelter);
+        return "redirect:/shelters/air";
+    }
+
+    @PostMapping("/shelter/edit/{id}")
+    public String updateAirShelter(@PathVariable("id") String id, AirRaidShelter shelter) {
+        airRaidShelterService.update(id, shelter);
+        return "redirect:/shelters/air";
+    }
+
+    @GetMapping("/shelter/delete/{id}")
+    public String deleteAirShelter(@PathVariable("id") String id) {
+        airRaidShelterService.delete(id);
         return "redirect:/shelters/air";
     }
 }

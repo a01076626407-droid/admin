@@ -2,8 +2,6 @@ package com.example.demo.service;
 
 import com.example.demo.domain.AirRaidShelter;
 import com.example.demo.repository.AirRaidShelterRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +17,6 @@ public class AirRaidShelterService {
 
     private final AirRaidShelterRepository airRaidShelterRepository;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     public Page<AirRaidShelter> getShelters(String keyword, Pageable pageable) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return airRaidShelterRepository.findAll(pageable);
@@ -35,7 +30,6 @@ public class AirRaidShelterService {
 
     @Transactional
     public void save(AirRaidShelter shelter) {
-        // 수동 할당 방식이므로 ID가 없으면 UUID로 자동 생성해서 부여
         if (shelter.getShltId() == null || shelter.getShltId().trim().isEmpty()) {
             shelter.setShltId("USER_" + UUID.randomUUID().toString());
         }
@@ -43,20 +37,30 @@ public class AirRaidShelterService {
     }
 
     @Transactional
+    public void update(String shltId, AirRaidShelter shelterDto) {
+        AirRaidShelter shelter = airRaidShelterRepository.findByShltId(shltId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 대피소가 존재하지 않습니다. shltId=" + shltId));
+
+        shelter.setFcltNm(shelterDto.getFcltNm());
+        shelter.setDaddr(shelterDto.getDaddr());
+    }
+
+    @Transactional
+    public void delete(String shltId) {
+        airRaidShelterRepository.deleteByShltId(shltId);
+    }
+
+    @Transactional
     public void syncData() {
         try {
             System.out.println(">>> 공습 대피소 파이썬 DB 연동 실행");
-
-            // 👉 파이썬 스크립트 실행 연동
             ProcessBuilder processBuilder = new ProcessBuilder("python", "scripts/airstrike.py");
-            processBuilder.inheritIO(); // 파이썬 실행 로그가 인텔리제이 콘솔에 보이도록 설정
+            processBuilder.inheritIO();
             Process process = processBuilder.start();
-
-            int exitCode = process.waitFor(); // 파이썬 실행이 끝날 때까지 대기
+            int exitCode = process.waitFor();
             if (exitCode != 0) {
                 throw new RuntimeException("파이썬 스크립트 실행 실패 (Exit Code: " + exitCode + ")");
             }
-
             System.out.println(">>> 공습 대피소 파이썬 DB 연동 완료");
         } catch (Exception e) {
             e.printStackTrace();
