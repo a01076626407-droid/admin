@@ -37,16 +37,16 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 
 if not API_KEY:
-    print("❌ API_KEY를 읽지 못했습니다.")
+    print("[ERROR] API_KEY를 읽지 못했습니다.")
     exit()
 
 if not DB_PASSWORD:
-    print("❌ DB_PASSWORD를 읽지 못했습니다.")
+    print("[ERROR] DB_PASSWORD를 읽지 못했습니다.")
     exit()
 
 
-print("✅ 공습대피소 API 인증키 읽기 완료")
-print("✅ DB 비밀번호 읽기 완료")
+print("[OK] 공습대피소 API 인증키 읽기 완료")
+print("[OK] DB 비밀번호 읽기 완료")
 
 
 # ============================================================
@@ -137,7 +137,7 @@ def fetch_and_save_data():
             **db_config
         )
 
-        print("✅ MySQL 연결 성공")
+        print("[OK] MySQL 연결 성공")
 
 
         with connection.cursor() as cursor:
@@ -152,7 +152,7 @@ def fetch_and_save_data():
                 "TRUNCATE TABLE airstrike"
             )
 
-            print("✅ 기존 데이터 삭제 완료")
+            print("[OK] 기존 데이터 삭제 완료")
 
 
             # ------------------------------------------------
@@ -239,7 +239,7 @@ def fetch_and_save_data():
                 # DB 저장 (주소 기반 구 이름 추출 및 se 컬럼에 '2' 고정 입력)
                 # ------------------------------------------------
 
-                for row in rows:
+                for idx, row in enumerate(rows):
 
                     # 좌표 변환 예외 처리
                     try:
@@ -273,11 +273,10 @@ def fetch_and_save_data():
                     se_value = "2"
 
 
-                    # RSTR_SN 값이 없거나 비어 있으면 대체 ID 생성 (예: 순번 등 또는 임의 문자열)
+                    # RSTR_SN 값이 없거나 비어 있으면 대체 ID 생성 (페이지 번호와 행 순번 조합으로 중복 방지)
                     shlt_id = row.get("RSTR_SN")
                     if not shlt_id:
-                        # 주소나 시설명을 활용하거나 임의의 고유값 부여 (예: fclt_nm 조합 등)
-                        shlt_id = f"AIR_{i}_{start}" # 안전하게 고유 문자열 생성
+                        shlt_id = f"AIR_{i}_{idx}"
 
                     values = (
                         shlt_id,
@@ -299,7 +298,7 @@ def fetch_and_save_data():
 
 
                 print(
-                    f"✅ {start} ~ {end} "
+                    f"[OK] {start} ~ {end} "
                     f"저장 완료!"
                 )
 
@@ -311,7 +310,7 @@ def fetch_and_save_data():
         connection.commit()
 
         print("\n========================================")
-        print("🎉 공습대피소 전체 데이터 저장 완료!")
+        print("[SUCCESS] 공습대피소 전체 데이터 저장 완료!")
         print("========================================")
 
 
@@ -364,13 +363,13 @@ def fetch_and_save_data():
 
     except Exception as e:
 
-        print("\n❌ 오류 발생!")
+        print("\n[ERROR] 오류 발생!")
         print(e)
 
         if connection:
             connection.rollback()
 
-            print("↩️ ROLLBACK 완료")
+            print("[ROLLBACK] ROLLBACK 완료")
 
 
     finally:

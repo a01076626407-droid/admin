@@ -33,6 +33,23 @@ public class EarthquakeShelterService {
 
     @Transactional
     public void syncData() {
-        System.out.println(">>> 지진 대피소 DB 연동 실행");
+        try {
+            System.out.println(">>> 지진 대피소 파이썬 DB 연동 실행");
+
+            // 👉 지진 대피소 파이썬 스크립트 실행 연동
+            ProcessBuilder processBuilder = new ProcessBuilder("python", "scripts/earthquake.py");
+            processBuilder.inheritIO(); // 파이썬 실행 로그가 인텔리제이 콘솔에 출력되도록 설정
+            Process process = processBuilder.start();
+
+            int exitCode = process.waitFor(); // 파이썬 실행 완료 대기
+            if (exitCode != 0) {
+                throw new RuntimeException("지진 파이썬 스크립트 실행 실패 (Exit Code: " + exitCode + ")");
+            }
+
+            System.out.println(">>> 지진 대피소 파이썬 DB 연동 완료");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("지진 DB 연동 중 오류 발생: " + e.getMessage());
+        }
     }
 }

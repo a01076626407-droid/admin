@@ -42,20 +42,20 @@ DB_PASSWORD = os.getenv(
 
 if not EARTHQUAKE_API_KEY:
     print(
-        "❌ EARTHQUAKE_API_KEY를 읽지 못했습니다."
+        "[ERROR] EARTHQUAKE_API_KEY를 읽지 못했습니다."
     )
     exit()
 
 
 if not DB_PASSWORD:
     print(
-        "❌ DB_PASSWORD를 읽지 못했습니다."
+        "[ERROR] DB_PASSWORD를 읽지 못했습니다."
     )
     exit()
 
 
-print("✅ 지진대피소 API 인증키 읽기 완료")
-print("✅ DB 비밀번호 읽기 완료")
+print("[OK] 지진대피소 API 인증키 읽기 완료")
+print("[OK] DB 비밀번호 읽기 완료")
 
 
 # ============================================================
@@ -146,7 +146,7 @@ def fetch_and_save_data():
             **db_config
         )
 
-        print("✅ MySQL 연결 성공")
+        print("[OK] MySQL 연결 성공")
 
 
         with connection.cursor() as cursor:
@@ -161,7 +161,7 @@ def fetch_and_save_data():
                 "TRUNCATE TABLE earthquake"
             )
 
-            print("✅ 기존 데이터 삭제 완료")
+            print("[OK] 기존 데이터 삭제 완료")
 
 
             # ------------------------------------------------
@@ -270,7 +270,7 @@ def fetch_and_save_data():
 
 
                 print(
-                    f"✅ {start} ~ {end} "
+                    f"[OK] {start} ~ {end} "
                     f"저장 완료!"
                 )
 
@@ -282,7 +282,7 @@ def fetch_and_save_data():
         connection.commit()
 
         print("\n========================================")
-        print("🎉 지진대피소 전체 데이터 저장 완료!")
+        print("[SUCCESS] 지진대피소 전체 데이터 저장 완료!")
         print("========================================")
 
 
@@ -325,13 +325,13 @@ def fetch_and_save_data():
 
     except Exception as e:
 
-        print("\n❌ 오류 발생!")
+        print("\n[ERROR] 오류 발생!")
         print(e)
 
         if connection:
             connection.rollback()
 
-            print("↩️ ROLLBACK 완료")
+            print("[ROLLBACK] ROLLBACK 완료")
 
 
     finally:

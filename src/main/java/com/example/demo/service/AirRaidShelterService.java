@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID; // 👉 UUID 추가
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +35,7 @@ public class AirRaidShelterService {
 
     @Transactional
     public void save(AirRaidShelter shelter) {
-        // 👉 수동 할당 방식이므로 ID가 없으면 UUID로 자동 생성해서 부여
+        // 수동 할당 방식이므로 ID가 없으면 UUID로 자동 생성해서 부여
         if (shelter.getShltId() == null || shelter.getShltId().trim().isEmpty()) {
             shelter.setShltId("USER_" + UUID.randomUUID().toString());
         }
@@ -45,7 +45,19 @@ public class AirRaidShelterService {
     @Transactional
     public void syncData() {
         try {
-            System.out.println(">>> 공습 대피소 DB 연동 실행");
+            System.out.println(">>> 공습 대피소 파이썬 DB 연동 실행");
+
+            // 👉 파이썬 스크립트 실행 연동
+            ProcessBuilder processBuilder = new ProcessBuilder("python", "scripts/airstrike.py");
+            processBuilder.inheritIO(); // 파이썬 실행 로그가 인텔리제이 콘솔에 보이도록 설정
+            Process process = processBuilder.start();
+
+            int exitCode = process.waitFor(); // 파이썬 실행이 끝날 때까지 대기
+            if (exitCode != 0) {
+                throw new RuntimeException("파이썬 스크립트 실행 실패 (Exit Code: " + exitCode + ")");
+            }
+
+            System.out.println(">>> 공습 대피소 파이썬 DB 연동 완료");
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("공습 DB 연동 중 오류 발생: " + e.getMessage());
