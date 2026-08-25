@@ -32,20 +32,30 @@ public class EarthquakeShelterService {
     }
 
     @Transactional
+    public void update(String shltId, EarthquakeShelter shelterDto) {
+        EarthquakeShelter shelter = earthquakeShelterRepository.findByShltId(shltId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 지진 대피소가 존재하지 않습니다. shltId=" + shltId));
+
+        shelter.setFcltNm(shelterDto.getFcltNm());
+        shelter.setDaddr(shelterDto.getDaddr());
+    }
+
+    @Transactional
+    public void delete(String shltId) {
+        earthquakeShelterRepository.deleteByShltId(shltId);
+    }
+
+    @Transactional
     public void syncData() {
         try {
             System.out.println(">>> 지진 대피소 파이썬 DB 연동 실행");
-
-            // 👉 지진 대피소 파이썬 스크립트 실행 연동
             ProcessBuilder processBuilder = new ProcessBuilder("python", "scripts/earthquake.py");
-            processBuilder.inheritIO(); // 파이썬 실행 로그가 인텔리제이 콘솔에 출력되도록 설정
+            processBuilder.inheritIO();
             Process process = processBuilder.start();
-
-            int exitCode = process.waitFor(); // 파이썬 실행 완료 대기
+            int exitCode = process.waitFor();
             if (exitCode != 0) {
                 throw new RuntimeException("지진 파이썬 스크립트 실행 실패 (Exit Code: " + exitCode + ")");
             }
-
             System.out.println(">>> 지진 대피소 파이썬 DB 연동 완료");
         } catch (Exception e) {
             e.printStackTrace();
