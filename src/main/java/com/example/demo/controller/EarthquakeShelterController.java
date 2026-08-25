@@ -30,6 +30,10 @@ public class EarthquakeShelterController {
         return "earthquake";
     }
 
+
+
+
+
     @PostMapping("/shelters/sync/earthquake")
     public String syncEarthquakeShelters() {
         earthquakeShelterService.syncData();
