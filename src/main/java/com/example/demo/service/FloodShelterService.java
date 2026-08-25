@@ -6,12 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class FloodShelterService {
+
     private final FloodShelterRepository floodShelterRepository;
 
     public Page<FloodShelter> getShelters(String keyword, Pageable pageable) {
@@ -21,7 +23,16 @@ public class FloodShelterService {
         return floodShelterRepository.findByFcltNmContainingOrDaddrContaining(keyword, keyword, pageable);
     }
 
-    public List<FloodShelter> getAllShelters() {
-        return floodShelterRepository.findAll();
+    @Transactional
+    public void save(FloodShelter shelter) {
+        if (shelter.getShltId() == null || shelter.getShltId().trim().isEmpty()) {
+            shelter.setShltId("FL_" + UUID.randomUUID().toString());
+        }
+        floodShelterRepository.save(shelter);
+    }
+
+    @Transactional
+    public void syncData() {
+        System.out.println(">>> 홍수 대피소 DB 연동 실행");
     }
 }

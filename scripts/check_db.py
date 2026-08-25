@@ -1,62 +1,43 @@
-import os
-import pymysql
-from dotenv import load_dotenv
+import urllib.parse
+import pandas as pd
+from sqlalchemy import create_engine
 
-# ============================================================
-# 1. .env 경로 설정 및 로드
-# ============================================================
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-dotenv_path = os.path.join(BASE_DIR, "config", ".env")
-load_dotenv(dotenv_path=dotenv_path, override=True)
+# 1. DB 접속 정보 설정
+DB_USER = "root"
+DB_PASSWORD = "root"
+DB_HOST = "localhost"
+DB_PORT = "3306"
+DB_NAME = "shelter_db"
 
-DB_PASSWORD = os.getenv("DB_PASSWORD")
+encoded_pw = urllib.parse.quote_plus(DB_PASSWORD)
+DB_URL = f"mysql+pymysql://{DB_USER}:{encoded_pw}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-if not DB_PASSWORD:
-    print("❌ DB_PASSWORD를 읽지 못했습니다.")
-    exit()
+def check_db():
+    engine = create_engine(DB_URL)
 
-db_config = {
-    "host": "localhost",
-    "user": "root",
-    "password": DB_PASSWORD,
-    "database": "disaster_db",
-    "charset": "utf8mb4"
-}
+    print("=" * 70)
+    print("🔍 [DB 검증] 홍수(flood) 테이블 상태 확인 시작")
+    print("=" * 70)
 
-def check_database():
-    connection = None
     try:
-        connection = pymysql.connect(**db_config)
-        with connection.cursor() as cursor:
-            print("\n========================================")
-            print("🔍 데이터베이스 대피소 적재 현황 검증")
-            print("========================================")
+        # 데이터 건수 확인
+        count_df = pd.read_sql("SELECT COUNT(*) as cnt FROM flood", con=engine)
+        count = count_df['cnt'].iloc[0]
 
-            # 1. 수해 대피소 개수 확인
-            cursor.execute("SELECT COUNT(*) FROM flood_shelter")
-            flood_count = cursor.fetchone()[0]
-            print(f"🌊 [수해대피소] flood_shelter: 총 {flood_count}건")
+        # 데이터 샘플 조회 (최근 1건)
+        sample_df = pd.read_sql("SELECT * FROM flood LIMIT 1", con=engine)
 
-            # 2. 지진 대피소 개수 확인
-            cursor.execute("SELECT COUNT(*) FROM earthquake_shelter")
-            earthquake_count = cursor.fetchone()[0]
-            print(f" زمین [지진대피소] earthquake_shelter: 총 {earthquake_count}건")
-
-            # 3. 공습 대피소 개수 확인
-            cursor.execute("SELECT COUNT(*) FROM air_shelter_info")
-            air_count = cursor.fetchone()[0]
-            print(f"🚨 [공습대피소] air_shelter_info: 총 {air_count}건")
-
-            print("========================================")
-            print("🎉 모든 대피소 데이터 검증 완료!")
-            print("========================================")
+        print(f"✅ 테이블명: FLOOD")
+        print(f"   - 총 데이터 수: {count:,}건")
+        print(f"   - 샘플 데이터 (se, mng_dept_nm 확인):")
+        print(sample_df[['se', 'mng_dept_nm']])
+        print("-" * 70)
 
     except Exception as e:
-        print("\n❌ 검증 중 오류 발생!")
-        print(e)
-    finally:
-        if connection:
-            connection.close()
+        print(f"❌ flood 테이블 조회 실패: {e}")
+        print("-" * 70)
+
+    print("🎉 홍수 테이블 검증 완료!")
 
 if __name__ == "__main__":
-    check_database()
+    check_db()
