@@ -16,7 +16,17 @@
         </div>
         <h1 class="font-bold text-slate-900 text-base">서울재난안전가이드</h1>
     </div>
+
+    <!-- 우측 상단 로그인 정보 및 로그아웃 버튼 영역 -->
     <div class="flex items-center gap-3">
+        <!-- 로그인 상태일 때만 표시 -->
+        <span th:if="${session.loginUser != null}" class="text-xs font-medium text-slate-700">
+            👤 <b th:text="${session.loginUser}" class="text-slate-900">사용자</b>님
+        </span>
+        <a th:href="@{/logout}" th:if="${session.loginUser != null}" class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-xl shadow-sm transition">
+            로그아웃
+        </a>
+
         <a href="/posts" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">
             <i class="fa-solid fa-list mr-1"></i> 게시글 목록
         </a>
@@ -30,6 +40,7 @@
         </button>
     </div>
 </header>
+
 <nav class="bg-white border-b border-slate-200 px-6 py-3 flex justify-center gap-2 shadow-sm">
     <a href="/shelters/air" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl transition"><i class="fa-solid fa-person-shelter mr-1"></i> 공습 대피소</a>
     <a href="/shelters/earthquake" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition"><i class="fa-solid fa-house-chimney-crack mr-1"></i> 지진 대피소</a>
@@ -143,7 +154,6 @@
 </div>
 
 <script>
-    // 등록 폼 유효성 검사
     function validateWriteForm(event) {
         const lot = document.getElementById('writeLot').value.trim();
         const lat = document.getElementById('writeLat').value.trim();
@@ -161,7 +171,6 @@
         return true;
     }
 
-    // 수정 폼 유효성 검사
     function validateEditForm(event) {
         const lot = document.getElementById('editLot').value.trim();
         const lat = document.getElementById('editLat').value.trim();
@@ -201,7 +210,6 @@
     }
 </script>
 
-<!-- 서버에서 전송한 성공 및 에러 메시지 알림 처리 -->
 <script th:inline="javascript">
     /*<![CDATA[*/
     var errorMessage = /*[[${errorMessage}]]*/ null;
