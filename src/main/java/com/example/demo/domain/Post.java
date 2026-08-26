@@ -1,5 +1,6 @@
 package com.example.demo.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,10 +19,12 @@ public class Post {
     private Long id;
 
     private String title;
-    @jakarta.persistence.Column(columnDefinition = "TEXT")
+
+    @Column(columnDefinition = "TEXT")
     private String content;
+
     private String writer;
 
-    // 작성 시간을 저장할 필드 추가
+    // 작성 시간을 저장할 필드
     private LocalDateTime createDate;
 }

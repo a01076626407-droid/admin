@@ -36,8 +36,13 @@ public class EarthquakeShelterService {
         EarthquakeShelter shelter = earthquakeShelterRepository.findByShltId(shltId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 지진 대피소가 존재하지 않습니다. shltId=" + shltId));
 
+        shelter.setCtpvNm(shelterDto.getCtpvNm());
+        shelter.setSggNm(shelterDto.getSggNm());
         shelter.setFcltNm(shelterDto.getFcltNm());
         shelter.setDaddr(shelterDto.getDaddr());
+        shelter.setLat(shelterDto.getLat()); // 👈 위도 반영
+        shelter.setLot(shelterDto.getLot()); // 👈 경도 반영
+        shelter.setMngDeptNm(shelterDto.getMngDeptNm());
     }
 
     @Transactional

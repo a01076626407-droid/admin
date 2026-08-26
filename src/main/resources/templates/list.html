@@ -1,133 +1,76 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>방명록 목록</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
-            margin: 0;
-            padding: 40px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            zoom: 1.95;
-        }
-        .header-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        h2 {
-            margin: 0;
-            color: #333;
-        }
-        .btn-write {
-            background-color: #007bff;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        .btn-write:hover {
-            background-color: #0056b3;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #dee2e6;
-            text-align: left;
-            font-size: 14px;
-        }
-        th {
-            background-color: #f8f9fa;
-            color: #333;
-        }
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            list-style: none;
-            padding: 0;
-        }
-        .pagination a {
-            padding: 6px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: white;
-            color: #007bff;
-        }
-        .pagination .active a {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style> body { zoom: 150%; } </style>
 </head>
-<body>
-
-<div class="container">
-    <div class="header-flex">
-        <h2>방명록 목록</h2>
-        <a href="/posts/write" class="btn-write">글쓰기</a>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
+<header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
+    <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white text-sm shadow-sm">
+            <i class="fa-solid fa-list"></i>
+        </div>
+        <h1 class="font-bold text-slate-900 text-base">서울재난안전가이드</h1>
     </div>
-
-    <table>
-        <thead>
-        <tr>
-            <th style="width: 10%;">번호</th>
-            <th style="width: 35%;">제목</th>
-            <th style="width: 15%;">작성자</th>
-            <th style="width: 25%;">내용</th>
-            <th style="width: 15%;">관리</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="post : ${paging}">
-            <td th:text="${post.id}">1</td>
-            <td>
-                <a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}">제목</a>
-            </td>
-            <td th:text="${post.writer}">작성자</td>
-            <td th:text="${post.content}">내용</td>
-            <td>
-                <!-- super 계정이거나 본인 글일 때만 수정/삭제 버튼 노출 -->
-                <div th:if="${session.loginUser == 'super' || session.loginUser == post.writer}">
-                    <a th:href="@{/posts/edit/{id}(id=${post.id})}" style="color: #007bff; text-decoration: none; margin-right: 8px;">수정</a>
-                    <a th:href="@{/posts/delete/{id}(id=${post.id})}" style="color: #dc3545; text-decoration: none;" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    <!-- 페이징 영역 (필요에 따라 유지 또는 연동) -->
-    <div style="text-align: center;" th:if="${paging.totalPages > 1}">
-        <span th:each="i : ${#numbers.sequence(0, paging.totalPages - 1)}">
-            <a th:href="@{/posts(page=${i})}" th:text="${i + 1}"
-               th:style="${i == paging.number} ? 'font-weight:bold; color:red;' : ''">1</a>
-        </span>
+    <div class="flex items-center gap-3">
+        <a href="/shelters/air" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+            <i class="fa-solid fa-person-shelter mr-1"></i> 대피소 조회하기
+        </a>
     </div>
-</div>
+</header>
 
+<main class="max-w-4xl mx-auto px-4 py-10 flex-1 w-full space-y-6">
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="font-bold text-slate-900 text-base">방명록 목록</h2>
+                <p class="text-xs text-slate-400">자유롭게 의견을 남겨주세요.</p>
+            </div>
+            <a href="/posts/write" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                <i class="fa-solid fa-pen mr-1"></i> 글쓰기
+            </a>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                    <th class="py-3 px-4">번호</th>
+                    <th class="py-3 px-4">제목</th>
+                    <th class="py-3 px-4">작성자</th>
+                    <th class="py-3 px-4">내용</th>
+                    <th class="py-3 px-4 text-center">관리</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                <tr th:each="post, stat : ${posts}" class="hover:bg-slate-50/50 transition">
+                    <td class="py-3 px-4 text-slate-500" th:text="${posts.totalElements - (posts.number * posts.size) - stat.index}">1</td>
+                    <td class="py-3 px-4 font-bold">
+                        <a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}" class="text-blue-600 hover:underline">제목</a>
+                    </td>
+                    <td class="py-3 px-4 text-slate-600" th:text="${post.writer}">작성자</td>
+                    <td class="py-3 px-4 text-slate-500 truncate max-w-xs" th:text="${post.content}">내용</td>
+
+                    <!-- 💡 SpEL 에러를 방지하기 위해 단순화된 안전 권한 체크 -->
+                    <td class="py-3 px-4 text-center space-x-2">
+                        <th:block th:if="${session.loginUser != null}">
+                            <th:block th:if="${session.loginUser == 'super' or session.loginUser == post.writer}">
+                                <a th:href="@{/posts/edit/{id}(id=${post.id})}" class="text-blue-600 hover:underline font-bold">수정</a>
+                                <a th:href="@{/posts/delete/{id}(id=${post.id})}" onclick="return confirm('정말 삭제하시겠습니까?');" class="text-rose-500 hover:underline font-bold">삭제</a>
+                            </th:block>
+                        </th:block>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center py-8 text-slate-400 text-xs" th:if="${posts == null or #lists.isEmpty(posts)}">등록된 게시글이 없습니다.</div>
+    </div>
+</main>
 </body>
 </html>
