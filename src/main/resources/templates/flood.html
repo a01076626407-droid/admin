@@ -93,7 +93,7 @@
     </div>
 </main>
 
-<!-- 등록 모달 -->
+<!-- 등록 모달 (위도/경도 시각적 배치와 name 값 완전 일치 교정 완료) -->
 <div id="writeModal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
     <div class="bg-white rounded-2xl p-6 w-full max-w-lg space-y-3 shadow-lg">
         <h3 class="font-bold text-slate-900 text-sm">새 홍수 대피소 등록</h3>
@@ -104,10 +104,13 @@
             </div>
             <div><label class="text-[11px] font-bold text-slate-600">대피소 이름</label><input type="text" name="fcltNm" required class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             <div><label class="text-[11px] font-bold text-slate-600">주소</label><input type="text" name="daddr" required class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
+
+            <!-- 왼쪽: 위도(lat), 오른쪽: 경도(lot)로 정확히 배치 -->
             <div class="grid grid-cols-2 gap-2">
-                <div><label class="text-[11px] font-bold text-slate-600">경도</label><input type="text" name="lot" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
-                <div><label class="text-[11px] font-bold text-slate-600">위도</label><input type="text" name="lat" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
+                <div><label class="text-[11px] font-bold text-slate-600">위도 (Lat)</label><input type="text" name="lat" placeholder="37.xxxxxx" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
+                <div><label class="text-[11px] font-bold text-slate-600">경도 (Lot)</label><input type="text" name="lot" placeholder="126.xxxxxx" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             </div>
+
             <div><label class="text-[11px] font-bold text-slate-600">관리부서명</label><input type="text" name="mngDeptNm" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             <div class="flex justify-end gap-2 pt-2">
                 <button type="button" onclick="document.getElementById('writeModal').classList.add('hidden')" class="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-bold rounded-xl">취소</button>
@@ -128,10 +131,13 @@
             </div>
             <div><label class="text-[11px] font-bold text-slate-600">대피소 이름</label><input type="text" id="editName" name="fcltNm" required class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             <div><label class="text-[11px] font-bold text-slate-600">주소</label><input type="text" id="editAddress" name="daddr" required class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
+
+            <!-- 수정 모달도 왼쪽: 위도(lat), 오른쪽: 경도(lot)로 정확히 배치 -->
             <div class="grid grid-cols-2 gap-2">
-                <div><label class="text-[11px] font-bold text-slate-600">경도</label><input type="text" id="editLot" name="lot" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
-                <div><label class="text-[11px] font-bold text-slate-600">위도</label><input type="text" id="editLat" name="lat" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
+                <div><label class="text-[11px] font-bold text-slate-600">위도 (Lat)</label><input type="text" id="editLat" name="lat" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
+                <div><label class="text-[11px] font-bold text-slate-600">경도 (Lot)</label><input type="text" id="editLot" name="lot" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             </div>
+
             <div><label class="text-[11px] font-bold text-slate-600">관리부서명</label><input type="text" id="editMng" name="mngDeptNm" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             <div class="flex justify-end gap-2 pt-2">
                 <button type="button" onclick="document.getElementById('editModal').classList.add('hidden')" class="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-bold rounded-xl">취소</button>
