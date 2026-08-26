@@ -7,7 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface EarthquakeShelterRepository extends JpaRepository<EarthquakeShelter, Long> {
+// JpaRepository의 두 번째 제네릭 타입을 Long에서 String으로 변경
+public interface EarthquakeShelterRepository extends JpaRepository<EarthquakeShelter, String> {
     Page<EarthquakeShelter> findByFcltNmContainingOrDaddrContaining(String fcltNm, String daddr, Pageable pageable);
     Optional<EarthquakeShelter> findByShltId(String shltId);
     void deleteByShltId(String shltId);

@@ -12,6 +12,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true) // 기본 읽기 성능 최적화
 public class EarthquakeShelterService {
 
     private final EarthquakeShelterRepository earthquakeShelterRepository;
@@ -23,7 +24,7 @@ public class EarthquakeShelterService {
         return earthquakeShelterRepository.findByFcltNmContainingOrDaddrContaining(keyword, keyword, pageable);
     }
 
-    @Transactional
+    @Transactional // 저장 트랜잭션
     public void save(EarthquakeShelter shelter) {
         if (shelter.getShltId() == null || shelter.getShltId().trim().isEmpty()) {
             shelter.setShltId("EQ_" + UUID.randomUUID().toString());
@@ -31,21 +32,25 @@ public class EarthquakeShelterService {
         earthquakeShelterRepository.save(shelter);
     }
 
-    @Transactional
+    @Transactional // 수정 트랜잭션 (Dirty Checking)
     public void update(String shltId, EarthquakeShelter shelterDto) {
         EarthquakeShelter shelter = earthquakeShelterRepository.findByShltId(shltId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 지진 대피소가 존재하지 않습니다. shltId=" + shltId));
 
+        shelter.setCtpvNm(shelterDto.getCtpvNm());
+        shelter.setSggNm(shelterDto.getSggNm());
         shelter.setFcltNm(shelterDto.getFcltNm());
         shelter.setDaddr(shelterDto.getDaddr());
+        shelter.setLat(shelterDto.getLat());
+        shelter.setLot(shelterDto.getLot());
+        shelter.setMngDeptNm(shelterDto.getMngDeptNm());
     }
 
-    @Transactional
+    @Transactional // 삭제 트랜잭션
     public void delete(String shltId) {
         earthquakeShelterRepository.deleteByShltId(shltId);
     }
 
-    @Transactional
     public void syncData() {
         try {
             System.out.println(">>> 지진 대피소 파이썬 DB 연동 실행");

@@ -13,8 +13,8 @@ import lombok.Setter;
 public class AirRaidShelter {
 
     @Id
-    @Column(name = "shlt_id") // 실제 DB의 PK 컬럼명과 매핑
-    private String shltId;      // 타입도 DB에 맞춰 String으로 지정 (IDENTITY 제거)
+    @Column(name = "shlt_id") // 실제 DB의 PK 컬럼명 매핑 (수동 할당 방식)
+    private String shltId;
 
     @Column(name = "ctpv_nm")
     private String ctpvNm;
@@ -29,10 +29,10 @@ public class AirRaidShelter {
     private String daddr;
 
     @Column(name = "lot")
-    private Double lot;
+    private Double lot; // 경도 (실수형)
 
     @Column(name = "lat")
-    private Double lat;
+    private Double lat; // 위도 (실수형)
 
     @Column(name = "mng_dept_nm")
     private String mngDeptNm;

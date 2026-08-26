@@ -17,6 +17,9 @@
         <h1 class="font-bold text-slate-900 text-base">서울재난안전가이드</h1>
     </div>
     <div class="flex items-center gap-3">
+        <a href="/posts" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">
+            <i class="fa-solid fa-list mr-1"></i> 게시글 목록
+        </a>
         <form th:action="@{/shelters/sync/air}" method="post" style="margin: 0;">
             <button type="submit" class="text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-bold px-3 py-1.5 rounded-full transition cursor-pointer">
                 <i class="fa-solid fa-database mr-1"></i>공습 대피소 DB 초기화
@@ -37,12 +40,11 @@
     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
         <div class="flex justify-between items-center">
             <div>
-                <h2 class="font-bold text-slate-900 text-base"> 공습 대피소 목록</h2>
+                <h2 class="font-bold text-slate-900 text-base">공습 대피소 목록</h2>
                 <p class="text-xs text-slate-400">등록된 공습 대피소 검색 및 관리 (총 <span th:text="${shelters.totalElements}">0</span>개)</p>
             </div>
         </div>
 
-        <!-- 검색 폼 -->
         <form action="/shelters/air" method="get" class="flex gap-2">
             <input type="text" name="keyword" th:value="${keyword}" placeholder="대피소 이름 또는 주소 검색" class="px-3 py-1.5 border border-slate-200 rounded-xl text-xs flex-1 focus:outline-none focus:border-blue-500">
             <button type="submit" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">검색</button>
@@ -77,14 +79,13 @@
                                 th:data-mng="${shelter.mngDeptNm}"
                                 onclick="openEditModal(this)"
                                 class="px-2.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition">수정</button>
-                        <a th:href="@{/shelter/delete/{id}(id=${shelter.shltId})}" onclick="return confirm('정말 삭제하시겠습니까?');" class="px-2.5 py-1.5 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-lg transition">삭제</a>
+                        <a th:href="@{/shelter/delete/{id}(id=${shelter.shltId}, keyword=${keyword})}" onclick="return confirm('정말 삭제하시겠습니까?');" class="px-2.5 py-1.5 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-lg transition">삭제</a>
                     </div>
                 </div>
             </div>
         </div>
         <div class="text-center py-8 text-slate-400 text-xs" th:if="${shelters == null or #lists.isEmpty(shelters)}">검색된 대피소 데이터가 없습니다.</div>
 
-        <!-- 페이지네이션 (검색 키워드 유지) -->
         <div class="flex justify-center items-center gap-2 pt-4 border-t border-slate-100" th:if="${shelters != null and shelters.totalPages > 0}">
             <a th:href="@{/shelters/air(page=${shelters.number - 1}, keyword=${keyword})}" th:if="${shelters.hasPrevious()}" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-50">이전</a>
             <span class="text-xs text-slate-600 font-bold" th:text="${shelters.number + 1 + ' / ' + shelters.totalPages}">1 / 1</span>
@@ -97,7 +98,7 @@
 <div id="writeModal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
     <div class="bg-white rounded-2xl p-6 w-full max-w-lg space-y-3 shadow-lg">
         <h3 class="font-bold text-slate-900 text-sm">새 공습 대피소 등록</h3>
-        <form action="/shelter/write" method="post" onsubmit="return showAlert(event, '공습 대피소 등록이 완료되었습니다!')" class="space-y-2.5">
+        <form action="/shelter/write" method="post" onsubmit="return validateWriteForm(event)" class="space-y-2.5">
             <div class="grid grid-cols-2 gap-2">
                 <div><label class="text-[11px] font-bold text-slate-600">시도명</label><input type="text" name="ctpvNm" placeholder="서울특별시" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
                 <div><label class="text-[11px] font-bold text-slate-600">시군구명</label><input type="text" name="sggNm" placeholder="종로구" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
@@ -105,8 +106,8 @@
             <div><label class="text-[11px] font-bold text-slate-600">대피소 이름</label><input type="text" name="fcltNm" required class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             <div><label class="text-[11px] font-bold text-slate-600">주소</label><input type="text" name="daddr" required class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             <div class="grid grid-cols-2 gap-2">
-                <div><label class="text-[11px] font-bold text-slate-600">경도</label><input type="text" name="lot" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
-                <div><label class="text-[11px] font-bold text-slate-600">위도</label><input type="text" name="lat" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
+                <div><label class="text-[11px] font-bold text-slate-600">경도</label><input type="text" id="writeLot" name="lot" placeholder="예: 126.9780" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
+                <div><label class="text-[11px] font-bold text-slate-600">위도</label><input type="text" id="writeLat" name="lat" placeholder="예: 37.5665" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             </div>
             <div><label class="text-[11px] font-bold text-slate-600">관리부서명</label><input type="text" name="mngDeptNm" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
             <div class="flex justify-end gap-2 pt-2">
@@ -121,7 +122,7 @@
 <div id="editModal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
     <div class="bg-white rounded-2xl p-6 w-full max-w-lg space-y-3 shadow-lg">
         <h3 class="font-bold text-slate-900 text-sm">공습 대피소 수정</h3>
-        <form id="editForm" method="post" class="space-y-2.5">
+        <form id="editForm" method="post" onsubmit="return validateEditForm(event)" class="space-y-2.5">
             <div class="grid grid-cols-2 gap-2">
                 <div><label class="text-[11px] font-bold text-slate-600">시도명</label><input type="text" id="editCtpv" name="ctpvNm" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
                 <div><label class="text-[11px] font-bold text-slate-600">시군구명</label><input type="text" id="editSgg" name="sggNm" class="w-full mt-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs"></div>
@@ -142,14 +143,53 @@
 </div>
 
 <script>
-    function showAlert(event, message) {
-        event.preventDefault();
-        alert(message);
-        event.target.submit();
+    // 등록 폼 유효성 검사
+    function validateWriteForm(event) {
+        const lot = document.getElementById('writeLot').value.trim();
+        const lat = document.getElementById('writeLat').value.trim();
+
+        if (lot !== "" && isNaN(lot)) {
+            alert("경도에는 숫자만 입력해야 합니다!");
+            event.preventDefault();
+            return false;
+        }
+        if (lat !== "" && isNaN(lat)) {
+            alert("위도에는 숫자만 입력해야 합니다!");
+            event.preventDefault();
+            return false;
+        }
+        return true;
+    }
+
+    // 수정 폼 유효성 검사
+    function validateEditForm(event) {
+        const lot = document.getElementById('editLot').value.trim();
+        const lat = document.getElementById('editLat').value.trim();
+
+        if (lot !== "" && isNaN(lot)) {
+            alert("경도에는 숫자만 입력해야 합니다!");
+            event.preventDefault();
+            return false;
+        }
+        if (lat !== "" && isNaN(lat)) {
+            alert("위도에는 숫자만 입력해야 합니다!");
+            event.preventDefault();
+            return false;
+        }
+        return true;
     }
 
     function openEditModal(button) {
-        document.getElementById('editForm').action = '/shelter/edit/' + button.getAttribute('data-id');
+        const id = button.getAttribute('data-id');
+        const urlParams = new URLSearchParams(window.location.search);
+        const keyword = urlParams.get('keyword');
+
+        let editAction = '/shelter/edit/' + id;
+        if (keyword) {
+            editAction += '?keyword=' + encodeURIComponent(keyword);
+        }
+
+        document.getElementById('editForm').action = editAction;
         document.getElementById('editCtpv').value = button.getAttribute('data-ctpv') || '';
         document.getElementById('editSgg').value = button.getAttribute('data-sgg') || '';
         document.getElementById('editName').value = button.getAttribute('data-name') || '';
@@ -159,6 +199,21 @@
         document.getElementById('editMng').value = button.getAttribute('data-mng') || '';
         document.getElementById('editModal').classList.remove('hidden');
     }
+</script>
+
+<!-- 서버에서 전송한 성공 및 에러 메시지 알림 처리 -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var errorMessage = /*[[${errorMessage}]]*/ null;
+    var successMessage = /*[[${successMessage}]]*/ null;
+
+    if (errorMessage) {
+        alert(errorMessage);
+    }
+    if (successMessage) {
+        alert(successMessage);
+    }
+    /*]]>*/
 </script>
 </body>
 </html>
