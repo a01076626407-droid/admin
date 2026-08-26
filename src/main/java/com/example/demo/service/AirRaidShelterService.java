@@ -13,6 +13,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true) // 읽기 전용 트랜잭션을 기본으로 설정하여 성능 최적화
 public class AirRaidShelterService {
 
     private final AirRaidShelterRepository airRaidShelterRepository;
@@ -28,7 +29,7 @@ public class AirRaidShelterService {
         return airRaidShelterRepository.findAll();
     }
 
-    @Transactional
+    @Transactional // 쓰기 작업에만 별도 선언
     public void save(AirRaidShelter shelter) {
         if (shelter.getShltId() == null || shelter.getShltId().trim().isEmpty()) {
             shelter.setShltId("USER_" + UUID.randomUUID().toString());
@@ -41,8 +42,13 @@ public class AirRaidShelterService {
         AirRaidShelter shelter = airRaidShelterRepository.findByShltId(shltId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 대피소가 존재하지 않습니다. shltId=" + shltId));
 
+        shelter.setCtpvNm(shelterDto.getCtpvNm());
+        shelter.setSggNm(shelterDto.getSggNm());
         shelter.setFcltNm(shelterDto.getFcltNm());
         shelter.setDaddr(shelterDto.getDaddr());
+        shelter.setLat(shelterDto.getLat());
+        shelter.setLot(shelterDto.getLot());
+        shelter.setMngDeptNm(shelterDto.getMngDeptNm());
     }
 
     @Transactional
@@ -50,7 +56,6 @@ public class AirRaidShelterService {
         airRaidShelterRepository.deleteByShltId(shltId);
     }
 
-    @Transactional
     public void syncData() {
         try {
             System.out.println(">>> 공습 대피소 파이썬 DB 연동 실행");

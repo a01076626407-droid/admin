@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -42,7 +43,7 @@ public class UserController {
             User user = userService.login(username, password);
             session.setAttribute("loginUser", user.getUsername());
 
-            // 로그인 성공 시, 게시판이 아닌 '메인 선택 화면(/main)'으로 강제 이동시킵니다.
+            // 로그인 성공 시 메인 화면으로 이동
             return "redirect:/main";
 
         } catch (IllegalArgumentException e) {
@@ -53,13 +54,29 @@ public class UserController {
 
     // 회원가입 처리 창구
     @PostMapping("/api/users/signup")
-    public String signup(UserSignupDto dto, Model model) {
+    public String signup(UserSignupDto dto, Model model, RedirectAttributes redirectAttributes) {
+        // 💡 [보안] SUPER 아이디(대소문자 무관) 가입 차단
+        if (dto.getUsername() != null && "super".equalsIgnoreCase(dto.getUsername().trim())) {
+            model.addAttribute("errorMessage", "해당 아이디(SUPER)는 최고 관리자 전용이므로 사용할 수 없습니다.");
+            return "signup";
+        }
+
         try {
             userService.registerUser(dto);
+            // 💡 회원가입 성공 메시지를 로그인 페이지로 전달
+            redirectAttributes.addFlashAttribute("successMessage", "회원가입이 완료되었습니다! 로그인해 주세요.");
             return "redirect:/login";
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
             return "signup";
         }
+    }
+
+    // 로그아웃 처리 창구
+    @GetMapping("/logout")
+    public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
+        session.invalidate();
+        redirectAttributes.addFlashAttribute("successMessage", "로그아웃되었습니다.");
+        return "redirect:/login";
     }
 }
