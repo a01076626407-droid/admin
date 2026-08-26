@@ -22,6 +22,8 @@ public class DataInitializer implements CommandLineRunner {
             superUser.setRealname("최고관리자");
             superUser.setEmail("super@admin.com");
 
+
+
             userRepository.save(superUser);
             System.out.println(">>> [시스템] 최고 관리자(super) 계정이 자동으로 생성되었습니다.");
         }
