@@ -16,18 +16,19 @@
         </div>
         <h1 class="font-bold text-slate-900 text-base">서울재난안전가이드</h1>
     </div>
-
-    <!-- 💡 우측 상단 로그인 정보 및 로그아웃 버튼 추가 -->
     <div class="flex items-center gap-3">
-        <!-- 로그인 상태일 때만 표시 -->
         <span th:if="${session.loginUser != null}" class="text-xs font-medium text-slate-700">
-            👤 <b th:text="${session.loginUser}" class="text-slate-900">사용자</b>님
+            👤 <b th:text="${session.loginUser}" class="text-slate-900">사용자</b> (<span th:text="${session.loginRole}" class="text-blue-600 font-bold">USER</span>)님
         </span>
+
+        <!-- 💡 최고 관리자(SUPER / super) 전용 권한 관리 승인 페이지 이동 버튼 -->
+        <a href="/admin/users" th:if="${session.loginRole == 'SUPER' or session.loginUser == 'super'}" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+            <i class="fa-solid fa-users-gear mr-1"></i> 권한 관리 승인
+        </a>
+
         <a th:href="@{/logout}" th:if="${session.loginUser != null}" class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-xl shadow-sm transition">
             로그아웃
         </a>
-
-        <!-- 기존 대피소 조회 버튼 -->
         <a href="/shelters/air" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
             <i class="fa-solid fa-person-shelter mr-1"></i> 대피소 조회하기
         </a>
@@ -63,16 +64,21 @@
                     <td class="py-3 px-4 font-bold">
                         <a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}" class="text-blue-600 hover:underline">제목</a>
                     </td>
-                    <td class="py-3 px-4 text-slate-600" th:text="${post.writer}">작성자</td>
+                    <td class="py-3 px-4 text-slate-600 font-bold" th:text="${post.writer}">작성자</td>
                     <td class="py-3 px-4 text-slate-500 truncate max-w-xs" th:text="${post.content}">내용</td>
 
-                    <!-- 수정된 권한 체크 (문자열 세션 값 비교) -->
                     <td class="py-3 px-4 text-center space-x-2">
                         <th:block th:if="${session.loginUser != null}">
-                            <th:block th:if="${session.loginUser == 'super' or session.loginUser == post.writer}">
-                                <a th:href="@{/posts/edit/{id}(id=${post.id})}" class="text-amber-600 hover:underline font-bold">수정</a>
-                                <a th:href="@{/posts/delete/{id}(id=${post.id})}" onclick="return confirm('정말 삭제하시겠습니까?');" class="text-rose-500 hover:underline font-bold">삭제</a>
-                            </th:block>
+                            <!-- 💡 수정 버튼: 최고 관리자, 글 작성자 본인, 또는 개별 수정 권한 보유자 -->
+                            <a th:if="${session.loginRole == 'SUPER' or session.loginUser == 'super' or session.loginUser == post.writer or session.canEdit == true}"
+                               th:href="@{/posts/edit/{id}(id=${post.id})}"
+                               class="text-amber-600 hover:underline font-bold">수정</a>
+
+                            <!-- 💡 삭제 버튼: 최고 관리자, 글 작성자 본인, 또는 개별 삭제 권한 보유자 -->
+                            <a th:if="${session.loginRole == 'SUPER' or session.loginUser == 'super' or session.loginUser == post.writer or session.canDelete == true}"
+                               th:href="@{/posts/delete/{id}(id=${post.id})}"
+                               onclick="return confirm('정말 삭제하시겠습니까?');"
+                               class="text-rose-500 hover:underline font-bold">삭제</a>
                         </th:block>
                     </td>
                 </tr>
@@ -82,7 +88,6 @@
 
         <div class="text-center py-8 text-slate-400 text-xs" th:if="${posts == null or #lists.isEmpty(posts)}">등록된 게시글이 없습니다.</div>
 
-        <!-- 페이징 내비게이션 영역 -->
         <div class="flex justify-center items-center gap-2 pt-4 border-t border-slate-100" th:if="${posts != null and posts.totalPages > 0}">
             <a th:href="@{/posts(page=${posts.number - 1})}" th:if="${posts.hasPrevious()}" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-50">이전</a>
             <span class="text-xs text-slate-600 font-bold" th:text="${posts.number + 1 + ' / ' + posts.totalPages}">1 / 1</span>

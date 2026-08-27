@@ -14,18 +14,18 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // DB에 'super' 계정이 없으면 자동 생성
         if (!userRepository.existsByUsername("super")) {
-            User superUser = new User();
-            superUser.setUsername("super");
-            superUser.setPassword("1234"); // 기본 비밀번호 (필요에 맞게 변경)
-            superUser.setRealname("최고관리자");
-            superUser.setEmail("super@admin.com");
-
-
-
-            userRepository.save(superUser);
-            System.out.println(">>> [시스템] 최고 관리자(super) 계정이 자동으로 생성되었습니다.");
+            User superAdmin = User.builder()
+                    .username("super")
+                    .password("super")
+                    .email("super@admin.com")
+                    .realname("최고관리자")
+                    .role("SUPER")
+                    .canEdit(true)
+                    .canDelete(true)
+                    .build();
+            userRepository.save(superAdmin);
+            System.out.println(">>> [스프링 초기화] 최고 관리자(super) 계정이 생성되었습니다. (PW: super)");
         }
     }
 }
