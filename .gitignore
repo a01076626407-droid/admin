@@ -42,3 +42,4 @@ application-secret.properties
 *.json
 *.xml
 logs/
+config/.env
