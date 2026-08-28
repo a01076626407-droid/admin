@@ -4,21 +4,31 @@ import pandas as pd
 from sqlalchemy import create_engine
 import sqlalchemy
 import pymysql
+from dotenv import load_dotenv  # .env 파일을 읽기 위해 추가
 
 # ============================================================
-# [DB 접속 정보 설정]
+# [환경 설정 및 .env 로드]
 # ============================================================
-DB_USER = "root"
-DB_PASSWORD = "root"
-DB_HOST = "localhost"
-DB_PORT = "3306"
-DB_NAME = "shelter_db"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+dotenv_path = os.path.join(BASE_DIR, "config", ".env")  # 경로에 맞게 조절 가능
+
+load_dotenv(dotenv_path=dotenv_path, override=True)
+
+# ============================================================
+# [DB 접속 정보 설정 (환경변수 연동)]
+# ============================================================
+DB_USER = os.getenv("DB_USER", "root")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "root")
+
+# 여기가 핵심! .env에 DB_HOST가 없으면 기본값 "localhost" 사용
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "3306")
+DB_NAME = os.getenv("DB_NAME", "shelter_db")
 
 encoded_pw = urllib.parse.quote_plus(DB_PASSWORD)
 DB_URL = f"mysql+pymysql://{DB_USER}:{encoded_pw}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 FOLDER_PATH = os.path.dirname(os.path.abspath(__file__))
-
 def create_super_admin():
     """서버 구동 시 super 관리자 계정이 없으면 자동 생성하는 함수"""
     print("=" * 65)

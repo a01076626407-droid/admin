@@ -63,12 +63,14 @@ BASE_URL = (
 # 4. MySQL 접속 정보 (shelter_db 사용)
 # ============================================================
 
+DB_HOST = os.getenv("DB_HOST", "localhost")  # .env에 없으면 기본 localhost
+
 db_config = {
-    "host": "localhost",
+    "host": DB_HOST,
     "user": "root",
     "password": DB_PASSWORD,
     "database": "shelter_db",
-    "charset": "utf8mb4"
+    "charset": "utf8mb4",
 }
 
 
