@@ -51,7 +51,6 @@ public class UserController {
             User user = userService.login(username, password);
             session.setAttribute("loginUser", user.getUsername());
             session.setAttribute("loginRole", user.getRole());
-            // 💡 개별 수정/삭제 권한도 세션에 등록
             session.setAttribute("canEdit", user.isCanEdit() || "SUPER".equals(user.getRole()));
             session.setAttribute("canDelete", user.isCanDelete() || "SUPER".equals(user.getRole()));
 
@@ -79,7 +78,7 @@ public class UserController {
         }
     }
 
-    // 💡 최고 관리자(SUPER) 전용: 권한 관리 승인 페이지 이동
+    // 최고 관리자(SUPER) 전용: 권한 관리 승인 페이지 이동
     @GetMapping("/admin/users")
     public String userPermissionPage(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         String currentRole = (String) session.getAttribute("loginRole");
@@ -91,10 +90,10 @@ public class UserController {
         }
 
         model.addAttribute("userList", userService.getAllUsers());
-        return "users";
+        return "users"; // 정상적인 뷰 템플릿(users.html) 반환
     }
 
-    // 💡 개별 유저 수정/삭제 권한 실시간 체크박스 비동기(AJAX) 저장
+    // 개별 유저 수정/삭제 권한 실시간 체크박스 비동기(AJAX) 저장
     @PostMapping("/admin/users/permissions/{id}")
     @ResponseBody
     public Map<String, Object> updatePermissions(
@@ -113,7 +112,7 @@ public class UserController {
         // 권한 업데이트
         userService.updateUserPermissions(id, canEdit, canDelete);
 
-        // 변경 후 계산된 최신 역할(Role) 확인 (SUPER는 유지, 수정+삭제 둘 다 있으면 ADMIN, 아니면 USER)
+        // 변경 후 계산된 최신 역할 확인
         String calculatedRole = (canEdit && canDelete) ? "ADMIN" : "USER";
 
         return Map.of(

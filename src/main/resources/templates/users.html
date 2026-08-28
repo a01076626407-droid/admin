@@ -51,13 +51,12 @@
           <td class="py-3 px-4 font-bold text-slate-800" th:text="${u.username}">user1</td>
           <td class="py-3 px-4 text-slate-600" th:text="${u.realname}">홍길동</td>
           <td class="py-3 px-4">
-            <!-- 💡 실시간 갱신을 위해 id="role-사용자id" 부여 -->
             <span th:id="|role-${u.id}|"
                   th:class="${u.role == 'SUPER' ? 'px-2 py-0.5 bg-rose-50 text-rose-600 font-bold rounded' : (u.role == 'ADMIN' ? 'px-2 py-0.5 bg-blue-50 text-blue-600 font-bold rounded' : 'px-2 py-0.5 bg-slate-100 text-slate-500 rounded')}"
                   th:text="${u.role}">USER</span>
           </td>
 
-          <!-- 💡 수정 권한: 클릭 즉시 updatePermission 함수 실행 -->
+          <!-- 수정 권한 체크박스 -->
           <td class="py-3 px-4 text-center">
             <input type="checkbox"
                    th:id="|edit-${u.id}|"
@@ -67,7 +66,7 @@
                    class="w-4 h-4 text-blue-600 rounded border-slate-300 cursor-pointer focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
           </td>
 
-          <!-- 💡 삭제 권한: 클릭 즉시 updatePermission 함수 실행 -->
+          <!-- 삭제 권한 체크박스 -->
           <td class="py-3 px-4 text-center">
             <input type="checkbox"
                    th:id="|delete-${u.id}|"
@@ -84,7 +83,6 @@
 </main>
 
 <script th:inline="javascript">
-  // 💡 체크박스 변경 시 비동기로 서버에 권한 저장 요청
   function updatePermission(userId) {
     const editCheckbox = document.getElementById('edit-' + userId);
     const deleteCheckbox = document.getElementById('delete-' + userId);
@@ -109,7 +107,6 @@
               return response.json();
             })
             .then(data => {
-              // 💡 역할 라벨 뱃지 실시간 변경
               const roleBadge = document.getElementById('role-' + userId);
               if (roleBadge && data.role) {
                 roleBadge.innerText = data.role;

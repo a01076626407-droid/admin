@@ -15,6 +15,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    // 로그인 검증
     public User login(String username, String password) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이디입니다."));
@@ -24,6 +25,7 @@ public class UserService {
         return user;
     }
 
+    // 회원가입 처리
     @Transactional
     public void registerUser(UserSignupDto dto) {
         if (userRepository.existsByUsername(dto.getUsername())) {
@@ -46,7 +48,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    // 💡 개별 유저 수정/삭제 권한 업데이트 로직
+    // 💡 개별 유저 수정/삭제 권한 업데이트 로직 (ADMIN 자동 승격/강등 포함)
     @Transactional
     public void updateUserPermissions(Long userId, boolean canEdit, boolean canDelete) {
         User user = userRepository.findById(userId)
@@ -65,6 +67,7 @@ public class UserService {
         }
     }
 
+    // 최고 관리자 권한 부여 메서드
     @Transactional
     public void grantAdminRole(String username) {
         User user = userRepository.findByUsername(username)
