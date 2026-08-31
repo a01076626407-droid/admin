@@ -4,13 +4,13 @@ import pandas as pd
 from sqlalchemy import create_engine
 import sqlalchemy
 import pymysql
-from dotenv import load_dotenv  # .env 파일을 읽기 위해 추가
+from dotenv import load_dotenv
 
 # ============================================================
-# [환경 설정 및 .env 로드]
+# [환경 설정 및 .env 로드] (루트 경로 config/.env 완벽 연동)
 # ============================================================
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-dotenv_path = os.path.join(BASE_DIR, "config", ".env")  # 경로에 맞게 조절 가능
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+dotenv_path = os.path.join(BASE_DIR, "config", ".env")
 
 load_dotenv(dotenv_path=dotenv_path, override=True)
 
@@ -19,8 +19,6 @@ load_dotenv(dotenv_path=dotenv_path, override=True)
 # ============================================================
 DB_USER = os.getenv("DB_USER", "root")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "root")
-
-# 여기가 핵심! .env에 DB_HOST가 없으면 기본값 "localhost" 사용
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "3306")
 DB_NAME = os.getenv("DB_NAME", "shelter_db")
@@ -28,15 +26,18 @@ DB_NAME = os.getenv("DB_NAME", "shelter_db")
 encoded_pw = urllib.parse.quote_plus(DB_PASSWORD)
 DB_URL = f"mysql+pymysql://{DB_USER}:{encoded_pw}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-FOLDER_PATH = os.path.dirname(os.path.abspath(__file__))
+# 엑셀 파일 탐색 경로 (scripts 폴더 및 프로젝트 루트 모두 지원)
+CURRENT_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 def create_super_admin():
     """서버 구동 시 super 관리자 계정이 없으면 자동 생성하는 함수"""
     print("=" * 65)
-    print("[Step 0] 최고 관리자(super) 계정 확인 및 생성 중...")
+    print(f"[Step 0] 최고 관리자(super) 계정 확인 및 생성 중... (Host: {DB_HOST})")
     print("=" * 65)
     try:
         connection = pymysql.connect(
             host=DB_HOST,
+            port=int(DB_PORT),
             user=DB_USER,
             password=DB_PASSWORD,
             database=DB_NAME,
@@ -64,9 +65,15 @@ def process_shelter_data(engine, prefix, table_name, prefix_id):
     print("=" * 65)
 
     target_file = None
-    for f in os.listdir(FOLDER_PATH):
-        if f.startswith(prefix) and (f.endswith(".xlsx") or f.endswith(".xls")):
-            target_file = os.path.join(FOLDER_PATH, f)
+    # 1. scripts 폴더 내 탐색 -> 2. 프로젝트 루트 폴더 탐색
+    search_dirs = [CURRENT_SCRIPT_DIR, BASE_DIR]
+    for directory in search_dirs:
+        if os.path.exists(directory):
+            for f in os.listdir(directory):
+                if f.startswith(prefix) and (f.endswith(".xlsx") or f.endswith(".xls")):
+                    target_file = os.path.join(directory, f)
+                    break
+        if target_file:
             break
 
     if not target_file:
@@ -87,18 +94,16 @@ def process_shelter_data(engine, prefix, table_name, prefix_id):
     else:
         clean_df['shlt_id'] = [f"{prefix_id}_{i}" for i in range(1, len(raw_df) + 1)]
 
-    clean_df['ctpv_nm'] = raw_df['ctpv_nm'].astype(str)
-    clean_df['sgg_nm'] = raw_df['sgg_nm'].astype(str)
-    clean_df['fclt_nm'] = raw_df['fclt_nm'].astype(str)
-    clean_df['daddr'] = raw_df['daddr'].astype(str)
+    clean_df['ctpv_nm'] = raw_df['ctpv_nm'].astype(str) if 'ctpv_nm' in raw_df.columns else "서울특별시"
+    clean_df['sgg_nm'] = raw_df['sgg_nm'].astype(str) if 'sgg_nm' in raw_df.columns else "-"
+    clean_df['fclt_nm'] = raw_df['fclt_nm'].astype(str) if 'fclt_nm' in raw_df.columns else "-"
+    clean_df['daddr'] = raw_df['daddr'].astype(str) if 'daddr' in raw_df.columns else ""
 
-    # 지진 등 일부 데이터는 lat/lot가 문자열이나 공백일 수 있으므로 numeric 변환
-    clean_df['lot'] = pd.to_numeric(raw_df['lot'], errors='coerce')
-    clean_df['lat'] = pd.to_numeric(raw_df['lat'], errors='coerce')
+    clean_df['lot'] = pd.to_numeric(raw_df['lot'], errors='coerce') if 'lot' in raw_df.columns else 0.0
+    clean_df['lat'] = pd.to_numeric(raw_df['lat'], errors='coerce') if 'lat' in raw_df.columns else 0.0
 
-    clean_df['mng_dept_nm'] = '-'
+    clean_df['mng_dept_nm'] = raw_df['mng_dept_nm'].astype(str) if 'mng_dept_nm' in raw_df.columns else '-'
 
-    # 테이블 구조에 'se' 컬럼이 있는 경우에만 추가 (airstrike, earthquake 등 스키마 차이 방어)
     if 'se' in raw_df.columns:
         clean_df['se'] = pd.to_numeric(raw_df['se'], errors='coerce').fillna(3).astype(int)
     else:
@@ -110,7 +115,6 @@ def process_shelter_data(engine, prefix, table_name, prefix_id):
     print(f"[Step] MySQL {table_name} 테이블에 데이터 적재 중...")
     try:
         column_order = ['shlt_id', 'ctpv_nm', 'sgg_nm', 'fclt_nm', 'daddr', 'lot', 'lat', 'mng_dept_nm', 'se']
-        # 혹시 테이블 스키마에 se 컬럼이 없다면 제외하고 맞춤
         actual_columns = [col for col in column_order if col in clean_df.columns]
         clean_df = clean_df[actual_columns]
 
@@ -133,16 +137,15 @@ def process_shelter_data(engine, prefix, table_name, prefix_id):
 
 def run_etl():
     create_super_admin()
-
     engine = create_engine(DB_URL)
 
     # 1. 홍수 대피소 적재
     process_shelter_data(engine, prefix="flood_shelter", table_name="flood", prefix_id="FL")
 
-    # 2. 공습 대피소 적재 (파일명이 airstrike_shelter로 시작해야 함)
+    # 2. 공습 대피소 적재
     process_shelter_data(engine, prefix="airstrike_shelter", table_name="airstrike", prefix_id="AS")
 
-    # 3. 지진 대피소 적재 (파일명이 earthquake_shelter로 시작해야 함)
+    # 3. 지진 대피소 적재
     process_shelter_data(engine, prefix="earthquake_shelter", table_name="earthquake", prefix_id="EQ")
 
 if __name__ == "__main__":
