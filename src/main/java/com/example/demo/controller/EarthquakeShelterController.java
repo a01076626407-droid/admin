@@ -38,15 +38,13 @@ public class EarthquakeShelterController {
             EarthquakeShelter shelter,
             RedirectAttributes redirectAttributes) {
 
-        // 위도/경도 숫자 유효성 검증
+        // 위도/경도 숫자 파싱 및 Double 타입 필드에 대입
         try {
             if (latStr != null && !latStr.trim().isEmpty()) {
-                Double.parseDouble(latStr); // 숫자인지 검증만 수행
-                shelter.setLat(latStr);     // String 타입 필드에 대입
+                shelter.setLat(Double.parseDouble(latStr));
             }
             if (lotStr != null && !lotStr.trim().isEmpty()) {
-                Double.parseDouble(lotStr); // 숫자인지 검증만 수행
-                shelter.setLot(lotStr);     // String 타입 필드에 대입
+                shelter.setLot(Double.parseDouble(lotStr));
             }
         } catch (NumberFormatException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "위도와 경도에는 숫자만 입력해야 합니다!");
@@ -67,15 +65,13 @@ public class EarthquakeShelterController {
             @RequestParam(value = "keyword", required = false) String keyword,
             RedirectAttributes redirectAttributes) {
 
-        // 위도/경도 숫자 유효성 검증
+        // 위도/경도 숫자 파싱 및 Double 타입 필드에 대입
         try {
             if (latStr != null && !latStr.trim().isEmpty()) {
-                Double.parseDouble(latStr); // 숫자인지 검증만 수행
-                shelterDto.setLat(latStr);  // String 타입 필드에 대입
+                shelterDto.setLat(Double.parseDouble(latStr));
             }
             if (lotStr != null && !lotStr.trim().isEmpty()) {
-                Double.parseDouble(lotStr); // 숫자인지 검증만 수행
-                shelterDto.setLot(lotStr);  // String 타입 필드에 대입
+                shelterDto.setLot(Double.parseDouble(lotStr));
             }
         } catch (NumberFormatException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "위도와 경도에는 숫자만 입력해야 합니다!");
