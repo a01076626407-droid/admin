@@ -8,7 +8,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor // JPA 스펙 준수를 위한 기본 생성자 추가 권장
+@NoArgsConstructor
 @Table(name = "earthquake")
 public class EarthquakeShelter {
 
@@ -17,23 +17,26 @@ public class EarthquakeShelter {
     private String shltId;
 
     @Column(name = "ctpv_nm")
-    private String ctpvNm;   // 시도명
+    private String ctpvNm;    // 시도명
 
     @Column(name = "sgg_nm")
-    private String sggNm;    // 시군구명
+    private String sggNm;     // 시군구명
 
     @Column(name = "fclt_nm")
-    private String fcltNm;   // 대피소 이름
+    private String fcltNm;    // 대피소 이름
 
     @Column(name = "daddr")
-    private String daddr;    // 주소
+    private String daddr;     // 주소
 
     @Column(name = "lot")
-    private String lot;      // 경도 (DB 컬럼이 VARCHAR인 경우)
+    private Double lot;       // 경도 (실수형 매핑 권장)
 
     @Column(name = "lat")
-    private String lat;      // 위도 (DB 컬럼이 VARCHAR인 경우)
+    private Double lat;       // 위도 (실수형 매핑 권장)
 
     @Column(name = "mng_dept_nm")
-    private String mngDeptNm;// 관리부서
+    private String mngDeptNm; // 관리부서
+
+    @Column(name = "se")      // 대피소 구분 코드 (지진: 3)
+    private String se;
 }

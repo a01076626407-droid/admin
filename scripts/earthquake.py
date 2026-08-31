@@ -5,7 +5,7 @@ import requests
 from dotenv import load_dotenv
 
 # ============================================================
-# 1. .env 경로 설정 및 로드
+# 1. .env 경로 설정 및 로드 (프로젝트 루트 config/.env 탐색)
 # ============================================================
 BASE_DIR = os.path.dirname(
     os.path.dirname(
@@ -22,6 +22,9 @@ load_dotenv(dotenv_path=dotenv_path, override=True)
 EARTHQUAKE_API_KEY = (os.getenv("EARTHQUAKE_API_KEY") or "").strip()
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "3306")
+DB_NAME = os.getenv("DB_NAME", "shelter_db")
+DB_USER = os.getenv("DB_USER", "root")
 
 if not EARTHQUAKE_API_KEY:
     print("[ERROR] EARTHQUAKE_API_KEY를 읽지 못했습니다.")
@@ -32,7 +35,7 @@ if not DB_PASSWORD:
     exit(0)
 
 print(f"[OK] 지진대피소 API 인증키 확인 완료 (앞 4자리: {EARTHQUAKE_API_KEY[:4]}***)")
-print(f"[OK] DB 대상 호스트: {DB_HOST}")
+print(f"[OK] DB 대상 호스트: {DB_HOST}:{DB_PORT}")
 
 # ============================================================
 # 3. 서울 지진대피소 API URL
@@ -45,9 +48,10 @@ BASE_URL = f"http://openapi.seoul.go.kr:8088/{EARTHQUAKE_API_KEY}/json/{SERVICE_
 # ============================================================
 db_config = {
     "host": DB_HOST,
-    "user": "root",
+    "port": int(DB_PORT),
+    "user": DB_USER,
     "password": DB_PASSWORD,
-    "database": "shelter_db",
+    "database": DB_NAME,
     "charset": "utf8mb4",
 }
 
@@ -67,7 +71,7 @@ def fetch_and_save_data():
         try:
             data = response.json()
         except Exception:
-            print(f"[ERROR] 서울시 지진 API 서버 응답이 JSON 형식이 아닙니다.")
+            print("[ERROR] 서울시 지진 API 서버 응답이 JSON 형식이 아닙니다.")
             print(f">>> 실제 응답 내용: {response.text.strip()}")
             return
 
@@ -101,6 +105,14 @@ def fetch_and_save_data():
         print("[OK] MySQL 연결 성공")
 
         with connection.cursor() as cursor:
+            # 1. se 컬럼 존재 여부 확인 및 자동 생성 (스키마 자동 보정)
+            cursor.execute("SHOW COLUMNS FROM earthquake LIKE 'se'")
+            if not cursor.fetchone():
+                print("[INFO] earthquake 테이블에 'se' 컬럼이 없어 자동으로 추가합니다...")
+                cursor.execute("ALTER TABLE earthquake ADD COLUMN se VARCHAR(50) DEFAULT '3'")
+                print("[OK] 'se' 컬럼 자동 추가 완료")
+
+            # 2. 기존 데이터 삭제
             print("\n[3] 기존 지진대피소 데이터 초기화 (TRUNCATE)...")
             cursor.execute("TRUNCATE TABLE earthquake")
             print("[OK] 기존 데이터 초기화 완료")

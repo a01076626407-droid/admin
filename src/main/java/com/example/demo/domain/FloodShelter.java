@@ -8,7 +8,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor // JPA 프록시 및 객체 생성을 위한 기본 생성자 추가 권장
+@NoArgsConstructor
 @Table(name = "flood")
 public class FloodShelter {
 
@@ -36,4 +36,7 @@ public class FloodShelter {
 
     @Column(name = "mng_dept_nm")
     private String mngDeptNm;// 관리부서명
+
+    @Column(name = "se")     // 대피소 구분 코드 (수해: 1)
+    private String se;
 }

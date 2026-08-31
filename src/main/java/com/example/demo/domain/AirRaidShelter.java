@@ -36,4 +36,7 @@ public class AirRaidShelter {
 
     @Column(name = "mng_dept_nm")
     private String mngDeptNm;
+
+    @Column(name = "se") // 대피소 구분 코드 (공습: 2)
+    private String se;
 }
